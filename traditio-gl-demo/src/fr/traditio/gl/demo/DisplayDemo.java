@@ -10,17 +10,13 @@ public class DisplayDemo {
 		try {
 			Display.setDisplayMode(new DisplayMode(800, 600));
 			Display.setTitle("DisplayDemo");
+			Display.setResizable(true);
 			Display.create();
 		} catch (TraditioGLException e) {
 			e.printStackTrace();
 		}
 
 		while (!Display.isCloseRequested()) {
-			try {
-				Display.setDisplayMode(new DisplayMode(1280, 720));
-			} catch (TraditioGLException e) {
-				e.printStackTrace();
-			}
 			
 			Display.update();
 		}

@@ -230,7 +230,7 @@ public class Display {
 		if (mode == null) {
 			throw new NullPointerException("Display mode must be non-null!");
 		}
-		
+
 		if (currentMode.equals(mode)) {
 			return;
 		}
@@ -319,6 +319,27 @@ public class Display {
 			}
 		} else {
 			return 0;
+		}
+	}
+
+	/**
+	 * Set the <code>Display</code> window's location. This is a no-op on fullscreen
+	 * windows. <br>
+	 * <b>note</b> If no location has been specified (or x == y == -1) the window
+	 * will be centered.
+	 *
+	 * @param newX The new window location on the X axis.
+	 * @param newY The new window location on the Y axis.
+	 */
+	public static void setLocation(int newX, int newY) {
+		// cache position
+		x = newX;
+		y = newY;
+
+		// offset if already created
+		if (isCreated() && !isFullscreen()) {
+			assert glfwWindowHandle != MemoryUtil.NULL;
+			GLFW.glfwSetWindowPos(glfwWindowHandle, getWindowX(), getWindowY());
 		}
 	}
 
