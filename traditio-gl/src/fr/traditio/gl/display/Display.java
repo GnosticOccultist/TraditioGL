@@ -53,17 +53,27 @@ public class Display {
 	 * Whether the window is resizable.
 	 */
 	private static boolean resizable;
-
-	private static long glfwWindowHandle;
-
+	/**
+	 * The window native handle.
+	 */
+	private static long glfwWindowHandle = MemoryUtil.NULL;
+	/**
+	 * The initial display mode.
+	 */
 	private static final DisplayMode initialMode;
-
+	/**
+	 * The current display mode.
+	 */
 	private static DisplayMode currentMode;
+	/**
+	 * The OpenGL context capabilities.
+	 */
 	private static GLCapabilities capabilities;
 
 	static {
 		try {
 			currentMode = initialMode = init();
+			Runtime.getRuntime().addShutdownHook(new Thread(Display::terminate));
 		} catch (TraditioGLException e) {
 			throw new RuntimeException(e);
 		}
@@ -76,6 +86,9 @@ public class Display {
 	}
 
 	private static DisplayMode init() throws TraditioGLException {
+		GLFW.glfwSetErrorCallback(
+				(error, desc) -> System.err.println("GLFW error: " + error + " description: " + desc));
+
 		if (!GLFW.glfwInit()) {
 			throw new TraditioGLException("Unable to initialize GLFW!");
 		}
@@ -106,7 +119,10 @@ public class Display {
 
 		GLFW.glfwDefaultWindowHints();
 		GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
+		GLFW.glfwWindowHint(GLFW.GLFW_CLIENT_API, GLFW.GLFW_OPENGL_API);
 		GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, resizable ? GLFW.GLFW_TRUE : GLFW.GLFW_FALSE);
+		GLFW.glfwWindowHint(GLFW.GLFW_POSITION_X, getWindowX());
+		GLFW.glfwWindowHint(GLFW.GLFW_POSITION_Y, getWindowY());
 
 		glfwWindowHandle = GLFW.glfwCreateWindow(getEffectiveMode().getWidth(), getEffectiveMode().getHeight(), title,
 				MemoryUtil.NULL, MemoryUtil.NULL);
@@ -125,15 +141,14 @@ public class Display {
 	}
 
 	private static void makeCurrentAndSetSwapInterval() throws TraditioGLException {
-		assert glfwWindowHandle != MemoryUtil.NULL;
-		GLFW.glfwMakeContextCurrent(glfwWindowHandle);
-		capabilities = GL.createCapabilities();
+		makeCurrent();
 
 		try {
 			checkGLError();
 		} catch (OpenGLException ex) {
 			System.err.println("OpenGL error during context creation: " + ex.getMessage());
 		}
+
 		setSwapInterval(swapInterval);
 	}
 
@@ -200,8 +215,11 @@ public class Display {
 		}
 
 		created = false;
+	}
 
+	private static void terminate() {
 		GLFW.glfwTerminate();
+		GLFW.glfwSetErrorCallback(null).free();
 	}
 
 	public static DisplayMode getDisplayMode() {
@@ -212,12 +230,21 @@ public class Display {
 		if (mode == null) {
 			throw new NullPointerException("Display mode must be non-null!");
 		}
+		
+		if (currentMode.equals(mode)) {
+			return;
+		}
 
 		currentMode = mode;
 		if (isCreated()) {
 			destroyWindow();
 
-			createWindow();
+			try {
+				createWindow();
+				makeCurrentAndSetSwapInterval();
+			} catch (TraditioGLException ex) {
+				throw ex;
+			}
 		}
 	}
 
@@ -234,6 +261,85 @@ public class Display {
 
 	public static DisplayMode[] getAvailableDisplayModes() throws TraditioGLException {
 		throw new TraditioGLException("Not implemented yet!");
+	}
+
+	/**
+	 * Returns whether the <code>Display</code>'s context is current in the current
+	 * thread.
+	 * 
+	 * @return Whether the context is current.
+	 */
+	public static boolean isCurrent() {
+		var current = GLFW.glfwGetCurrentContext();
+		if (current == MemoryUtil.NULL) {
+			return false;
+		}
+
+		return current == glfwWindowHandle;
+	}
+
+	public static void makeCurrent() throws TraditioGLException {
+		if (glfwWindowHandle == MemoryUtil.NULL) {
+			throw new TraditioGLException("Cannot make display's context current on non-existent window!");
+		}
+
+		GLFW.glfwMakeContextCurrent(glfwWindowHandle);
+		capabilities = GL.createCapabilities();
+	}
+
+	public static void releaseContext() throws TraditioGLException {
+		if (!isCurrent()) {
+			throw new TraditioGLException("Cannot release non-current display's context!");
+		}
+
+		GLFW.glfwMakeContextCurrent(MemoryUtil.NULL);
+		capabilities = null;
+	}
+
+	private static int getWindowX() {
+		if (!isFullscreen()) {
+			// If no display location set, center window.
+			if (x == -1) {
+				return Math.max(0, (initialMode.getWidth() - currentMode.getWidth()) / 2);
+			} else {
+				return x;
+			}
+		} else {
+			return 0;
+		}
+	}
+
+	private static int getWindowY() {
+		if (!isFullscreen()) {
+			// If no display location set, center window.
+			if (y == -1) {
+				return Math.max(0, (initialMode.getHeight() - currentMode.getHeight()) / 2);
+			} else {
+				return y;
+			}
+		} else {
+			return 0;
+		}
+	}
+
+	public static int getWidth() {
+		if (Display.isFullscreen()) {
+			return Display.getDisplayMode().getWidth();
+		}
+
+		return width;
+	}
+
+	public static int getHeight() {
+		if (Display.isFullscreen()) {
+			return Display.getDisplayMode().getHeight();
+		}
+
+		return height;
+	}
+
+	public static boolean isFullscreen() {
+		return fullscreen;
 	}
 
 	/**
@@ -267,6 +373,54 @@ public class Display {
 	 */
 	public static boolean isResizable() {
 		return resizable;
+	}
+
+	/**
+	 * Enable or disable the window <code>Display</code> to be resized.
+	 *
+	 * @param enable Whether the window should be resizable.
+	 */
+	public static void setResizable(boolean enable) {
+		if (resizable == enable) {
+			return;
+		}
+
+		resizable = enable;
+		if (isCreated()) {
+			destroyWindow();
+
+			try {
+				createWindow();
+				makeCurrentAndSetSwapInterval();
+			} catch (TraditioGLException ex) {
+				throw new RuntimeException(ex);
+			}
+		}
+	}
+
+	/**
+	 * Return the title of the window <code>Display</code>.
+	 *
+	 * @return The window title or empty for no title.
+	 */
+	public static String getTitle() {
+		return title;
+	}
+
+	/**
+	 * Set the title of the window <code>Display</code>.
+	 *
+	 * @param newTitle The new window title or null for no title.
+	 */
+	public static void setTitle(String newTitle) {
+		if (newTitle == null) {
+			newTitle = "";
+		}
+		title = newTitle;
+		if (isCreated()) {
+			assert glfwWindowHandle != MemoryUtil.NULL;
+			GLFW.glfwSetWindowTitle(glfwWindowHandle, title);
+		}
 	}
 
 	/**
