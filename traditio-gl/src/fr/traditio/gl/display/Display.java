@@ -10,6 +10,7 @@ import org.lwjgl.system.MemoryUtil;
 
 import fr.traditio.gl.TraditioGLException;
 import fr.traditio.gl.opengl.OpenGLException;
+import fr.traditio.gl.opengl.TGLContext;
 
 /**
  * 
@@ -53,6 +54,10 @@ public class Display {
 	 * Whether the window is resizable.
 	 */
 	private static boolean resizable;
+	/**
+	 * Whether the window has been resized.
+	 */
+	private static boolean resized;
 	/**
 	 * The window native handle.
 	 */
@@ -131,6 +136,16 @@ public class Display {
 			throw new TraditioGLException("Failed to create the GLFW window!");
 		}
 
+		GLFW.glfwSetFramebufferSizeCallback(glfwWindowHandle, (handle, newWidth, newHeight) -> {
+			if (newWidth != 0 && newHeight != 0) {
+
+				width = newWidth;
+				height = newHeight;
+
+				resized = true;
+			}
+		});
+
 		width = Display.getDisplayMode().getWidth();
 		height = Display.getDisplayMode().getHeight();
 
@@ -176,6 +191,8 @@ public class Display {
 		} catch (TraditioGLException ex) {
 			throw new RuntimeException(ex);
 		}
+
+		resized = false;
 
 		if (processMessages) {
 			GLFW.glfwPollEvents();
@@ -285,6 +302,14 @@ public class Display {
 
 		GLFW.glfwMakeContextCurrent(glfwWindowHandle);
 		capabilities = GL.createCapabilities();
+		try {
+			var c = TGLContext.class.getDeclaredConstructor(GLCapabilities.class);
+			c.trySetAccessible();
+			c.newInstance(capabilities);
+
+		} catch (Exception ex) {
+			throw new TraditioGLException("Failed to instantiate Traditio-GL context!", ex);
+		}
 	}
 
 	public static void releaseContext() throws TraditioGLException {
@@ -292,8 +317,9 @@ public class Display {
 			throw new TraditioGLException("Cannot release non-current display's context!");
 		}
 
-		GLFW.glfwMakeContextCurrent(MemoryUtil.NULL);
+		TGLContext.release();
 		capabilities = null;
+		GLFW.glfwMakeContextCurrent(MemoryUtil.NULL);
 	}
 
 	private static int getWindowX() {
@@ -376,6 +402,15 @@ public class Display {
 
 		assert glfwWindowHandle != MemoryUtil.NULL;
 		return GLFW.glfwWindowShouldClose(glfwWindowHandle);
+	}
+
+	/**
+	 * Return whether the window <code>Display</code> was resized.
+	 * 
+	 * @return Whether the window was resized.
+	 */
+	public static boolean wasResized() {
+		return resized;
 	}
 
 	/**
