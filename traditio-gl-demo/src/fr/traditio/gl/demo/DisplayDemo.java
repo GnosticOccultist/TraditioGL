@@ -7,6 +7,8 @@ import static fr.traditio.gl.opengl.TGL11.*;
 
 public class DisplayDemo {
 
+	private static float rotation;
+
 	public static void main(String[] args) {
 		try {
 			Display.setDisplayMode(new DisplayMode(800, 600));
@@ -31,6 +33,58 @@ public class DisplayDemo {
 			if (Display.wasResized()) {
 				loadMatrix();
 			}
+
+			glMatrixMode(GL_MODELVIEW);
+			glLoadIdentity();
+			glTranslatef(0, 0, -5);
+			glRotatef((float) Math.toRadians(rotation), 1.0f, 1.0f, 1.0f);
+
+			rotation = (rotation + 0.5f) % 360;
+
+			glBegin(GL_TRIANGLES);
+			glVertex3f(-0.5f, 0.5f, 0.5f);
+			glVertex3f(-0.5f, -0.5f, 0.5f);
+			glVertex3f(0.5f, 0.5f, 0.5f);
+			glVertex3f(0.5f, 0.5f, 0.5f);
+			glVertex3f(-0.5f, -0.5f, 0.5f);
+			glVertex3f(0.5f, -0.5f, 0.5f);
+
+			glVertex3f(-0.5f, 0.5f, -0.5f);
+			glVertex3f(-0.5f, 0.5f, 0.5f);
+			glVertex3f(0.5f, 0.5f, 0.5f);
+			glVertex3f(0.5f, 0.5f, -0.5f);
+			glVertex3f(-0.5f, 0.5f, -0.5f);
+			glVertex3f(0.5f, 0.5f, 0.5f);
+
+			glVertex3f(0.5f, 0.5f, 0.5f);
+			glVertex3f(0.5f, -0.5f, 0.5f);
+			glVertex3f(0.5f, -0.5f, -0.5f);
+			glVertex3f(0.5f, 0.5f, -0.5f);
+			glVertex3f(0.5f, 0.5f, 0.5f);
+			glVertex3f(0.5f, -0.5f, -0.5f);
+
+			glVertex3f(-0.5f, -0.5f, -0.5f);
+			glVertex3f(-0.5f, -0.5f, 0.5f);
+			glVertex3f(-0.5f, 0.5f, 0.5f);
+			glVertex3f(-0.5f, -0.5f, -0.5f);
+			glVertex3f(-0.5f, 0.5f, 0.5f);
+			glVertex3f(-0.5f, 0.5f, -0.5f);
+
+			glVertex3f(0.5f, -0.5f, 0.5f);
+			glVertex3f(-0.5f, -0.5f, 0.5f);
+			glVertex3f(-0.5f, -0.5f, -0.5f);
+			glVertex3f(0.5f, -0.5f, 0.5f);
+			glVertex3f(-0.5f, -0.5f, -0.5f);
+			glVertex3f(0.5f, -0.5f, -0.5f);
+
+			glVertex3f(0.5f, -0.5f, -0.5f);
+			glVertex3f(-0.5f, -0.5f, -0.5f);
+			glVertex3f(-0.5f, 0.5f, -0.5f);
+			glVertex3f(0.5f, -0.5f, -0.5f);
+			glVertex3f(-0.5f, 0.5f, -0.5f);
+			glVertex3f(0.5f, 0.5f, -0.5f);
+
+			glEnd();
 
 			glRectf(-0.5f, 0.5f, 0.5F, -0.5f);
 

@@ -68,6 +68,20 @@ public class TGL11 {
 		matrix.perspective(fovy, aspect, zNear, zFar);
 	}
 
+	public static void glTranslatef(float x, float y, float z) {
+		var c = TGLContext.get();
+		var stack = c.getOrCreateMatrixStack();
+		var matrix = stack.peek();
+		matrix.translate(x, y, z);
+	}
+
+	public static void glRotatef(float angle, float x, float y, float z) {
+		var c = TGLContext.get();
+		var stack = c.getOrCreateMatrixStack();
+		var matrix = stack.peek();
+		matrix.rotate(angle, x, y, z);
+	}
+
 	public static void glClear(int mask) {
 		TGLContext.checkContext();
 		GL11.glClear(mask);
@@ -116,16 +130,22 @@ public class TGL11 {
 		c.mesh.finish();
 	}
 
+	public static void glVertex3f(float x, float y, float z) {
+		var c = TGLContext.get();
+		var m = c.mesh;
+		m.putVertex(x, y, z, 1, 1, 1, 1, 0, 0, 0);
+	}
+
 	public static void glRectf(float x1, float y1, float x2, float y2) {
 		var c = TGLContext.get();
 		var m = c.mesh;
 		glBegin(GL_TRIANGLES);
-		m.putVertex(x1, y1, -1, 1, 1, 1, 1, 0, 0, 0);
-		m.putVertex(x1, y2, -1, 1, 1, 1, 1, 0, 0, 0);
-		m.putVertex(x2, y1, -1, 1, 1, 1, 1, 0, 0, 0);
-		m.putVertex(x2, y1, -1, 1, 1, 1, 1, 0, 0, 0);
-		m.putVertex(x1, y2, -1, 1, 1, 1, 1, 0, 0, 0);
-		m.putVertex(x2, y2, -1, 1, 1, 1, 1, 0, 0, 0);
+		m.putVertex(x1, y1, 0, 1, 1, 1, 1, 0, 0, 0);
+		m.putVertex(x1, y2, 0, 1, 1, 1, 1, 0, 0, 0);
+		m.putVertex(x2, y1, 0, 1, 1, 1, 1, 0, 0, 0);
+		m.putVertex(x2, y1, 0, 1, 1, 1, 1, 0, 0, 0);
+		m.putVertex(x1, y2, 0, 1, 1, 1, 1, 0, 0, 0);
+		m.putVertex(x2, y2, 0, 1, 1, 1, 1, 0, 0, 0);
 		glEnd();
 	}
 
