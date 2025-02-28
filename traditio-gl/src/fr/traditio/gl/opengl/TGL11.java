@@ -11,6 +11,8 @@ public class TGL11 {
 	public static final int GL_STENCIL_BUFFER_BIT = 0x400;
 	public static final int GL_COLOR_BUFFER_BIT = 0x4000;
 
+	public static final int GL_DEPTH_TEST = 0xB71;
+
 	static final int TGL_NO_DRAW = -1;
 	public static final int GL_POINTS = 0x0;
 	public static final int GL_LINES = 0x1;
@@ -23,6 +25,16 @@ public class TGL11 {
 	public static final int GL_QUAD_STRIP = 0x8;
 	public static final int GL_POLYGON = 0x9;
 
+	public static void glEnable(int target) {
+		TGLContext.checkContext();
+		GL11.glEnable(target);
+	}
+
+	public static void glDisable(int target) {
+		TGLContext.checkContext();
+		GL11.glDisable(target);
+	}
+
 	public static void glMatrixMode(int mode) {
 		var c = TGLContext.get();
 		if (c.matrixMode != mode) {
@@ -32,7 +44,28 @@ public class TGL11 {
 
 	public static void glLoadIdentity() {
 		var c = TGLContext.get();
-		c.getOrCreateMatrixStack();
+		var stack = c.getOrCreateMatrixStack();
+		var matrix = stack.peek();
+		matrix.identity();
+	}
+
+	public static void glPushMatrix() {
+		var c = TGLContext.get();
+		var stack = c.getOrCreateMatrixStack();
+		stack.push();
+	}
+
+	public static void glPopMatrix() {
+		var c = TGLContext.get();
+		var stack = c.getOrCreateMatrixStack();
+		stack.pop();
+	}
+
+	public static void gluPerspective(float fovy, float aspect, float zNear, float zFar) {
+		var c = TGLContext.get();
+		var stack = c.getOrCreateMatrixStack();
+		var matrix = stack.peek();
+		matrix.perspective(fovy, aspect, zNear, zFar);
 	}
 
 	public static void glClear(int mask) {
@@ -50,7 +83,7 @@ public class TGL11 {
 			GL11.glClearColor(r, g, b, a);
 		}
 	}
-	
+
 	public static void glViewport(int x, int y, int w, int h) {
 		var c = TGLContext.get();
 		if (c.vx != x || c.vy != y || c.vw != w || c.vh != h) {
@@ -67,7 +100,8 @@ public class TGL11 {
 		if (c.drawMode != mode) {
 			c.drawMode = mode;
 		}
-		
+
+		c.prepareShader();
 		c.mesh.start();
 	}
 
@@ -81,12 +115,12 @@ public class TGL11 {
 		var c = TGLContext.get();
 		var m = c.mesh;
 		glBegin(GL_TRIANGLES);
-		m.putVertex(x1, y1, 0, 1, 1, 1, 1, 0, 0, 0);
-		m.putVertex(x1, y2, 0, 1, 1, 1, 1, 0, 0, 0);
-		m.putVertex(x2, y1, 0, 1, 1, 1, 1, 0, 0, 0);
-		m.putVertex(x2, y1, 0, 1, 1, 1, 1, 0, 0, 0);
-		m.putVertex(x1, y2, 0, 1, 1, 1, 1, 0, 0, 0);
-		m.putVertex(x2, y2, 0, 1, 1, 1, 1, 0, 0, 0);
+		m.putVertex(x1, y1, -1, 1, 1, 1, 1, 0, 0, 0);
+		m.putVertex(x1, y2, -1, 1, 1, 1, 1, 0, 0, 0);
+		m.putVertex(x2, y1, -1, 1, 1, 1, 1, 0, 0, 0);
+		m.putVertex(x2, y1, -1, 1, 1, 1, 1, 0, 0, 0);
+		m.putVertex(x1, y2, -1, 1, 1, 1, 1, 0, 0, 0);
+		m.putVertex(x2, y2, -1, 1, 1, 1, 1, 0, 0, 0);
 		glEnd();
 	}
 

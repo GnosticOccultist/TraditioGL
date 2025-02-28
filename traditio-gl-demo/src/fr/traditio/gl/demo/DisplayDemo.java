@@ -17,14 +17,17 @@ public class DisplayDemo {
 			e.printStackTrace();
 		}
 
+		glEnable(GL_DEPTH_TEST);
+		glClearColor(0, 0, 0, 0);
+
+		loadMatrix();
+
 		while (!Display.isCloseRequested()) {
 
-			glClear(GL_COLOR_BUFFER_BIT);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			glClearColor(0, 0, 0, 0);
-			
 			if (Display.wasResized()) {
-				glViewport(0, 0, Display.getWidth(), Display.getHeight());
+				loadMatrix();
 			}
 
 			glRectf(-0.5f, 0.5f, 0.5F, -0.5f);
@@ -35,5 +38,12 @@ public class DisplayDemo {
 		}
 
 		Display.destroy();
+	}
+
+	private static void loadMatrix() {
+		glViewport(0, 0, Display.getWidth(), Display.getHeight());
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(70.0f, (float) Display.getWidth() / (float) Display.getHeight(), 0.1f, 100f);
 	}
 }

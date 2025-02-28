@@ -42,14 +42,25 @@ public final class Matrix4f {
 		return this;
 	}
 
+	public Matrix4f perspective(float fovY, float aspectRatio, float zNear, float zFar) {
+		float tanFOV = (float) Math.tan(Math.toRadians(fovY / 2));
+
+		set(0, 0, 1 / (tanFOV * aspectRatio));
+		set(1, 1, 1 / tanFOV);
+		set(2, 2, (zFar + zNear) / (zNear - zFar));
+		set(3, 2, ((zFar + zFar) * zNear) / (zNear - zFar));
+		set(2, 3, -1);
+		set(3, 3, 0);
+
+		return this;
+	}
+
 	public void get(FloatBuffer buffer) {
 		for (int i = 0; i < 4; ++i) {
 			for (int j = 0; j < 4; ++j) {
 				buffer.put(m[i * 4 + j]);
 			}
 		}
-
-		buffer.flip();
 	}
 
 	private void set(int x, int y, float value) {

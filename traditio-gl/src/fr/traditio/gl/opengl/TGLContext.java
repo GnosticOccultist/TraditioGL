@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.lwjgl.opengl.GLCapabilities;
 
-import fr.traditio.gl.math.Matrix4f;
 import fr.traditio.gl.math.MatrixStack;
 
 public class TGLContext {
@@ -41,12 +40,21 @@ public class TGLContext {
 	}
 
 	private void initialize() {
-		shader.uniformMat4("projection", new Matrix4f());
-		shader.uniformMat4("modelView", new Matrix4f());
+		shader.uniformMat4("projection", getOrCreateMatrixStack(TGL11.GL_PROJECTION).peek());
+		shader.uniformMat4("modelView", getOrCreateMatrixStack(TGL11.GL_MODELVIEW).peek());
 		shader.uniform4f("diffuseColor", 1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
+	void prepareShader() {
+		shader.uniformMat4("projection", getOrCreateMatrixStack(TGL11.GL_PROJECTION).peek());
+		shader.uniformMat4("modelView", getOrCreateMatrixStack(TGL11.GL_MODELVIEW).peek());
+	}
+
 	MatrixStack getOrCreateMatrixStack() {
+		return getOrCreateMatrixStack(matrixMode);
+	}
+
+	MatrixStack getOrCreateMatrixStack(int matrixMode) {
 		var stack = matrixStacks.get(matrixMode);
 		if (stack == null) {
 			stack = new MatrixStack();

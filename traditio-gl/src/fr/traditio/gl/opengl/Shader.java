@@ -30,6 +30,7 @@ class Shader {
 		try (var stack = MemoryStack.stackPush()) {
 			var buffer = stack.mallocFloat(16);
 			value.get(buffer);
+			buffer.flip();
 			GL20.glUniformMatrix4fv(loc, false, buffer);
 		}
 	}
