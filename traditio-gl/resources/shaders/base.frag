@@ -8,5 +8,5 @@ out vec4 fragColor;
 
 void main() {
 
-	fragColor = vertex_color;
+	fragColor = vertex_color * diffuseColor;
 }

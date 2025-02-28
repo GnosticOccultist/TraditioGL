@@ -22,6 +22,8 @@ public class DisplayDemo {
 
 		loadMatrix();
 
+		glColor4f(1, 0, 1, 1);
+
 		while (!Display.isCloseRequested()) {
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

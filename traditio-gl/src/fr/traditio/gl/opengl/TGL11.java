@@ -95,6 +95,11 @@ public class TGL11 {
 		}
 	}
 
+	public static void glColor4f(float r, float g, float b, float a) {
+		var c = TGLContext.get();
+		c.diffuseColor.set(r, g, b, a);
+	}
+
 	public static void glBegin(int mode) {
 		var c = TGLContext.get();
 		if (c.drawMode != mode) {

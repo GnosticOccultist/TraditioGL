@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.lwjgl.opengl.GLCapabilities;
 
+import fr.traditio.gl.math.Color4f;
 import fr.traditio.gl.math.MatrixStack;
 
 public class TGLContext {
@@ -26,6 +27,8 @@ public class TGLContext {
 
 	final Map<Integer, MatrixStack> matrixStacks = new HashMap<>();
 
+	final Color4f diffuseColor = new Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+
 	final Shader shader = new Shader("base");
 
 	int drawMode = TGL11.TGL_NO_DRAW;
@@ -40,14 +43,13 @@ public class TGLContext {
 	}
 
 	private void initialize() {
-		shader.uniformMat4("projection", getOrCreateMatrixStack(TGL11.GL_PROJECTION).peek());
-		shader.uniformMat4("modelView", getOrCreateMatrixStack(TGL11.GL_MODELVIEW).peek());
-		shader.uniform4f("diffuseColor", 1.0f, 1.0f, 1.0f, 1.0f);
+		prepareShader();
 	}
 
 	void prepareShader() {
 		shader.uniformMat4("projection", getOrCreateMatrixStack(TGL11.GL_PROJECTION).peek());
 		shader.uniformMat4("modelView", getOrCreateMatrixStack(TGL11.GL_MODELVIEW).peek());
+		shader.uniform4f("diffuseColor", diffuseColor.r(), diffuseColor.g(), diffuseColor.b(), diffuseColor.a());
 	}
 
 	MatrixStack getOrCreateMatrixStack() {
