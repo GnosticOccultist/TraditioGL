@@ -24,8 +24,6 @@ public class DisplayDemo {
 
 		loadMatrix();
 
-		glColor4f(1, 0, 1, 1);
-
 		while (!Display.isCloseRequested()) {
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -36,12 +34,15 @@ public class DisplayDemo {
 
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
-			glTranslatef(0, 0, -5);
+			glTranslatef(0, 0, -2);
 			glRotatef((float) Math.toRadians(rotation), 1.0f, 1.0f, 1.0f);
 
-			rotation = (rotation + 0.5f) % 360;
+			rotation = (rotation + 0.2f) % 360;
+
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 			glBegin(GL_TRIANGLES);
+			glColor3f(0, 1, 0);
 			glVertex3f(-0.5f, 0.5f, 0.5f);
 			glVertex3f(-0.5f, -0.5f, 0.5f);
 			glVertex3f(0.5f, 0.5f, 0.5f);
@@ -49,6 +50,9 @@ public class DisplayDemo {
 			glVertex3f(-0.5f, -0.5f, 0.5f);
 			glVertex3f(0.5f, -0.5f, 0.5f);
 
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+			glColor3f(1, 0, 0);
 			glVertex3f(-0.5f, 0.5f, -0.5f);
 			glVertex3f(-0.5f, 0.5f, 0.5f);
 			glVertex3f(0.5f, 0.5f, 0.5f);
@@ -56,6 +60,7 @@ public class DisplayDemo {
 			glVertex3f(-0.5f, 0.5f, -0.5f);
 			glVertex3f(0.5f, 0.5f, 0.5f);
 
+			glColor3f(0, 0, 1);
 			glVertex3f(0.5f, 0.5f, 0.5f);
 			glVertex3f(0.5f, -0.5f, 0.5f);
 			glVertex3f(0.5f, -0.5f, -0.5f);
@@ -63,6 +68,7 @@ public class DisplayDemo {
 			glVertex3f(0.5f, 0.5f, 0.5f);
 			glVertex3f(0.5f, -0.5f, -0.5f);
 
+			glColor3f(0, 1, 1);
 			glVertex3f(-0.5f, -0.5f, -0.5f);
 			glVertex3f(-0.5f, -0.5f, 0.5f);
 			glVertex3f(-0.5f, 0.5f, 0.5f);
@@ -70,6 +76,7 @@ public class DisplayDemo {
 			glVertex3f(-0.5f, 0.5f, 0.5f);
 			glVertex3f(-0.5f, 0.5f, -0.5f);
 
+			glColor3f(1, 1, 0);
 			glVertex3f(0.5f, -0.5f, 0.5f);
 			glVertex3f(-0.5f, -0.5f, 0.5f);
 			glVertex3f(-0.5f, -0.5f, -0.5f);
@@ -77,6 +84,7 @@ public class DisplayDemo {
 			glVertex3f(-0.5f, -0.5f, -0.5f);
 			glVertex3f(0.5f, -0.5f, -0.5f);
 
+			glColor3f(1, 0, 1);
 			glVertex3f(0.5f, -0.5f, -0.5f);
 			glVertex3f(-0.5f, -0.5f, -0.5f);
 			glVertex3f(-0.5f, 0.5f, -0.5f);

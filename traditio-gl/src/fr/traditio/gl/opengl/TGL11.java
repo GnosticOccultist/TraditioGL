@@ -25,6 +25,25 @@ public class TGL11 {
 	public static final int GL_QUAD_STRIP = 0x8;
 	public static final int GL_POLYGON = 0x9;
 
+	public static final int GL_NONE = 0;
+	public static final int GL_FRONT_LEFT = 0x400;
+	public static final int GL_FRONT_RIGHT = 0x401;
+	public static final int GL_BACK_LEFT = 0x402;
+	public static final int GL_BACK_RIGHT = 0x403;
+	public static final int GL_FRONT = 0x404;
+	public static final int GL_BACK = 0x405;
+	public static final int GL_LEFT = 0x406;
+	public static final int GL_RIGHT = 0x407;
+	public static final int GL_FRONT_AND_BACK = 0x408;
+	public static final int GL_AUX0 = 0x409;
+	public static final int GL_AUX1 = 0x40A;
+	public static final int GL_AUX2 = 0x40B;
+	public static final int GL_AUX3 = 0x40C;
+
+	public static final int GL_POINT = 0x1B00;
+	public static final int GL_LINE = 0x1B01;
+	public static final int GL_FILL = 0x1B02;
+
 	public static void glEnable(int target) {
 		TGLContext.checkContext();
 		GL11.glEnable(target);
@@ -33,6 +52,17 @@ public class TGL11 {
 	public static void glDisable(int target) {
 		TGLContext.checkContext();
 		GL11.glDisable(target);
+	}
+
+	public static void glPolygonMode(int face, int mode) {
+		var c = TGLContext.get();
+		if (face != c.polyFace || mode != c.polyFill) {
+			c.mesh.flush();
+			c.polyFace = face;
+			c.polyFill = mode;
+			
+			GL11.glPolygonMode(face, mode);
+		}
 	}
 
 	public static void glMatrixMode(int mode) {
@@ -109,11 +139,6 @@ public class TGL11 {
 		}
 	}
 
-	public static void glColor4f(float r, float g, float b, float a) {
-		var c = TGLContext.get();
-		c.diffuseColor.set(r, g, b, a);
-	}
-
 	public static void glBegin(int mode) {
 		var c = TGLContext.get();
 		if (c.drawMode != mode) {
@@ -130,22 +155,42 @@ public class TGL11 {
 		c.mesh.finish();
 	}
 
+	public static void glColor3f(float r, float g, float b) {
+		var c = TGLContext.get();
+		c.vertexColor.set(r, g, b, 1.0f);
+	}
+
+	public static void glColor4f(float r, float g, float b, float a) {
+		var c = TGLContext.get();
+		c.vertexColor.set(r, g, b, a);
+	}
+
+	public static void glTexCoord2f(float s, float t) {
+		var c = TGLContext.get();
+		c.vertexTex.set(s, t, 0);
+	}
+
+	public static void glNormal3f(float nx, float ny, float nz) {
+		var c = TGLContext.get();
+		c.vertexNorm.set(nx, ny, nz);
+	}
+
 	public static void glVertex3f(float x, float y, float z) {
 		var c = TGLContext.get();
 		var m = c.mesh;
-		m.putVertex(x, y, z, 1, 1, 1, 1, 0, 0, 0);
+		m.putVertex(x, y, z, c.vertexColor, c.vertexTex, c.vertexNorm);
 	}
 
 	public static void glRectf(float x1, float y1, float x2, float y2) {
 		var c = TGLContext.get();
 		var m = c.mesh;
 		glBegin(GL_TRIANGLES);
-		m.putVertex(x1, y1, 0, 1, 1, 1, 1, 0, 0, 0);
-		m.putVertex(x1, y2, 0, 1, 1, 1, 1, 0, 0, 0);
-		m.putVertex(x2, y1, 0, 1, 1, 1, 1, 0, 0, 0);
-		m.putVertex(x2, y1, 0, 1, 1, 1, 1, 0, 0, 0);
-		m.putVertex(x1, y2, 0, 1, 1, 1, 1, 0, 0, 0);
-		m.putVertex(x2, y2, 0, 1, 1, 1, 1, 0, 0, 0);
+		m.putVertex(x1, y1, 0, c.vertexColor);
+		m.putVertex(x1, y2, 0, c.vertexColor);
+		m.putVertex(x2, y1, 0, c.vertexColor);
+		m.putVertex(x2, y1, 0, c.vertexColor);
+		m.putVertex(x1, y2, 0, c.vertexColor);
+		m.putVertex(x2, y2, 0, c.vertexColor);
 		glEnd();
 	}
 

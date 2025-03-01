@@ -7,6 +7,7 @@ import org.lwjgl.opengl.GLCapabilities;
 
 import fr.traditio.gl.math.Color4f;
 import fr.traditio.gl.math.MatrixStack;
+import fr.traditio.gl.math.Vector3f;
 
 public class TGLContext {
 
@@ -27,11 +28,18 @@ public class TGLContext {
 
 	final Map<Integer, MatrixStack> matrixStacks = new HashMap<>();
 
-	final Color4f diffuseColor = new Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+	final Color4f vertexColor = new Color4f(1.0f, 1.0f, 1.0f, 1.0f);
+
+	final Vector3f vertexTex = new Vector3f(0.0f, 0.0f, 0.0f);
+
+	final Vector3f vertexNorm = new Vector3f(0.0f, 0.0f, 0.0f);
 
 	final Shader shader = new Shader("base");
 
 	int drawMode = TGL11.TGL_NO_DRAW;
+
+	int polyFace = TGL11.GL_FRONT_AND_BACK;
+	int polyFill = TGL11.GL_FILL;
 
 	final Mesh mesh = new Mesh(600);
 
@@ -49,7 +57,6 @@ public class TGLContext {
 	void prepareShader() {
 		shader.uniformMat4("projection", getOrCreateMatrixStack(TGL11.GL_PROJECTION).peek());
 		shader.uniformMat4("modelView", getOrCreateMatrixStack(TGL11.GL_MODELVIEW).peek());
-		shader.uniform4f("diffuseColor", diffuseColor.r(), diffuseColor.g(), diffuseColor.b(), diffuseColor.a());
 	}
 
 	MatrixStack getOrCreateMatrixStack() {
@@ -80,6 +87,12 @@ public class TGLContext {
 		sb.append("\tglMatrixMode(" + matrixMode + ")");
 		sb.append("\n");
 		sb.append("\tmatrixStacks(" + matrixStacks + ")");
+		sb.append("\n");
+		sb.append("\tvertexColor(" + vertexColor + ")");
+		sb.append("\n");
+		sb.append("\tvertexTex(" + vertexTex + ")");
+		sb.append("\n");
+		sb.append("\tvertexNorm(" + vertexNorm + ")");
 		sb.append("\n]");
 
 		return sb.toString();

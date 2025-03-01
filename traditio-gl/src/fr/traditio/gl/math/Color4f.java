@@ -1,6 +1,6 @@
 package fr.traditio.gl.math;
 
-public class Color4f {
+public final class Color4f {
 
 	private float r, g, b, a;
 

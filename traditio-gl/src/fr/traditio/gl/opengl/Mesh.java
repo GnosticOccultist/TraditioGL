@@ -4,9 +4,12 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 
+import fr.traditio.gl.math.Color4f;
+import fr.traditio.gl.math.Vector3f;
+
 class Mesh {
 
-	protected static final int VERTEX_SIZE = 3 + 4 + 3;
+	protected static final int VERTEX_SIZE = 3 + 4 + 2 + 3;
 
 	protected static final int SPRITE_SIZE = 4 * VERTEX_SIZE;
 
@@ -62,14 +65,17 @@ class Mesh {
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
 		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, size, GL15.GL_DYNAMIC_DRAW);
 
-		GL30.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 10 * Float.BYTES, 0);
+		GL30.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 12 * Float.BYTES, 0);
 		GL30.glEnableVertexAttribArray(0);
 
-		GL30.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, false, 10 * Float.BYTES, 3 * Float.BYTES);
+		GL30.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, true, 12 * Float.BYTES, 3 * Float.BYTES);
 		GL30.glEnableVertexAttribArray(1);
 
-		GL30.glVertexAttribPointer(2, 3, GL11.GL_FLOAT, true, 10 * Float.BYTES, 7 * Float.BYTES);
+		GL30.glVertexAttribPointer(2, 2, GL11.GL_FLOAT, false, 12 * Float.BYTES, 7 * Float.BYTES);
 		GL30.glEnableVertexAttribArray(2);
+
+		GL30.glVertexAttribPointer(3, 3, GL11.GL_FLOAT, false, 12 * Float.BYTES, 9 * Float.BYTES);
+		GL30.glEnableVertexAttribArray(3);
 
 		this.allocatedSize = size;
 	}
@@ -84,9 +90,32 @@ class Mesh {
 		return false;
 	}
 
-	protected void putVertex(float x, float y, float z, float r, float g, float b, float a, float nx, float ny,
-			float nz) {
-		ensureCapacity(10);
+	protected void putVertex(float x, float y, float z, Color4f c, Vector3f t, Vector3f n) {
+		ensureCapacity(12);
+
+		vertices[currentIndex] = x;
+		vertices[currentIndex + 1] = y;
+		vertices[currentIndex + 2] = z;
+		vertices[currentIndex + 3] = c.r();
+		vertices[currentIndex + 4] = c.g();
+		vertices[currentIndex + 5] = c.b();
+		vertices[currentIndex + 6] = c.a();
+		vertices[currentIndex + 7] = t.x();
+		vertices[currentIndex + 8] = t.y();
+		vertices[currentIndex + 9] = n.x();
+		vertices[currentIndex + 10] = n.y();
+		vertices[currentIndex + 11] = n.z();
+
+		this.currentIndex += 12;
+	}
+
+	protected void putVertex(float x, float y, float z, Color4f c) {
+		putVertex(x, y, z, c.r(), c.g(), c.b(), c.a(), 0, 0, 0, 0, 0);
+	}
+
+	protected void putVertex(float x, float y, float z, float r, float g, float b, float a, float s, float t, float nx,
+			float ny, float nz) {
+		ensureCapacity(12);
 
 		vertices[currentIndex] = x;
 		vertices[currentIndex + 1] = y;
@@ -95,11 +124,13 @@ class Mesh {
 		vertices[currentIndex + 4] = g;
 		vertices[currentIndex + 5] = b;
 		vertices[currentIndex + 6] = a;
-		vertices[currentIndex + 7] = nx;
-		vertices[currentIndex + 8] = ny;
-		vertices[currentIndex + 9] = nz;
+		vertices[currentIndex + 7] = s;
+		vertices[currentIndex + 8] = t;
+		vertices[currentIndex + 9] = nx;
+		vertices[currentIndex + 10] = ny;
+		vertices[currentIndex + 11] = nz;
 
-		this.currentIndex += 10;
+		this.currentIndex += 12;
 	}
 
 	public void flush() {
@@ -120,12 +151,14 @@ class Mesh {
 		GL30.glEnableVertexAttribArray(0);
 		GL30.glEnableVertexAttribArray(1);
 		GL30.glEnableVertexAttribArray(2);
+		GL30.glEnableVertexAttribArray(3);
 
 		GL15.glDrawArrays(mode.toGLMode(), 0, currentIndex);
 
 		GL30.glDisableVertexAttribArray(0);
 		GL30.glDisableVertexAttribArray(1);
 		GL30.glDisableVertexAttribArray(2);
+		GL30.glDisableVertexAttribArray(3);
 		GL30.glBindVertexArray(0);
 
 		this.currentIndex = 0;
@@ -145,7 +178,7 @@ class Mesh {
 	public void destroy() {
 		GL15.glDeleteBuffers(vbo);
 		vbo = -1;
-		
+
 		GL30.glDeleteVertexArrays(vao);
 		vao = -1;
 
