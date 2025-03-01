@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL11;
 
 public final class Texture {
 
-	private int id;
+	private int id = -1;
 
 	private int width, height;
 
@@ -55,5 +55,10 @@ public final class Texture {
 
 	public int id() {
 		return id;
+	}
+
+	public void cleanup() {
+		GL11.glDeleteTextures(id);
+		this.id = -1;
 	}
 }

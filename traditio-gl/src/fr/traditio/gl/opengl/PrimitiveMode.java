@@ -48,4 +48,31 @@ enum PrimitiveMode {
 			throw new IllegalStateException("Invalid primitive mode " + this);
 		}
 	}
+
+	static PrimitiveMode fromGL(int mode) {
+		switch (mode) {
+		case GL11.GL_POINTS:
+			return PrimitiveMode.POINTS;
+		case GL11.GL_LINES:
+			return PrimitiveMode.LINES;
+		case GL11.GL_LINE_STRIP:
+			return PrimitiveMode.LINE_STRIP;
+		case GL11.GL_LINE_LOOP:
+			return PrimitiveMode.LINE_LOOP;
+		case GL11.GL_TRIANGLES:
+			return PrimitiveMode.TRIANGLES;
+		case GL11.GL_TRIANGLE_STRIP:
+			return PrimitiveMode.TRIANGLE_STRIP;
+		case GL11.GL_TRIANGLE_FAN:
+			return PrimitiveMode.TRIANGLE_FAN;
+		case GL11.GL_QUADS:
+			return PrimitiveMode.QUADS;
+		case GL11.GL_QUAD_STRIP:
+			return PrimitiveMode.QUAD_STRIP;
+		case GL11.GL_POLYGON:
+			return PrimitiveMode.POLYGON;
+		default:
+			throw new IllegalStateException("Invalid OpenGL primitive mode " + mode);
+		}
+	}
 }

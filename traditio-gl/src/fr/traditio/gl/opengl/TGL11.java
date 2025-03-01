@@ -16,7 +16,6 @@ public class TGL11 {
 	public static final int GL_CULL_FACE = 0xB44;
 	public static final int GL_TEXTURE_2D = 0xDE1;
 
-	static final int TGL_NO_DRAW = -1;
 	public static final int GL_POINTS = 0x0;
 	public static final int GL_LINES = 0x1;
 	public static final int GL_LINE_LOOP = 0x2;
@@ -187,9 +186,6 @@ public class TGL11 {
 
 	public static void glBegin(int mode) {
 		var c = TGLContext.get();
-		if (c.drawMode != mode) {
-			c.drawMode = mode;
-		}
 
 		if (c.boundTex2D == 0) {
 			// No bound texture in context, so ignore the define in shader.
@@ -200,6 +196,7 @@ public class TGL11 {
 
 		c.prepareShader();
 		c.mesh.start();
+		c.mesh.setMode(PrimitiveMode.fromGL(mode));
 	}
 
 	public static void glEnd() {
@@ -238,12 +235,12 @@ public class TGL11 {
 		var c = TGLContext.get();
 		var m = c.mesh;
 		glBegin(GL_TRIANGLES);
-		m.putVertex(x1, y1, 0, c.vertexColor);
-		m.putVertex(x1, y2, 0, c.vertexColor);
-		m.putVertex(x2, y1, 0, c.vertexColor);
-		m.putVertex(x2, y1, 0, c.vertexColor);
-		m.putVertex(x1, y2, 0, c.vertexColor);
-		m.putVertex(x2, y2, 0, c.vertexColor);
+		m.putVertex(x1, y1, -1, c.vertexColor);
+		m.putVertex(x1, y2, -1, c.vertexColor);
+		m.putVertex(x2, y1, -1, c.vertexColor);
+		m.putVertex(x2, y1, -1, c.vertexColor);
+		m.putVertex(x1, y2, -1, c.vertexColor);
+		m.putVertex(x2, y2, -1, c.vertexColor);
 		glEnd();
 	}
 

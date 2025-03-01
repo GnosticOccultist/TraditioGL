@@ -185,6 +185,10 @@ class Mesh {
 		allocatedSize = 0;
 	}
 
+	public void setMode(PrimitiveMode mode) {
+		this.mode = mode;
+	}
+
 	public boolean isStarted() {
 		return started;
 	}

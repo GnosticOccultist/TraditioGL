@@ -46,8 +46,6 @@ public class TGLContext {
 
 	final Map<DefineSet, Shader> shaders = new HashMap<>();
 
-	int drawMode = TGL11.TGL_NO_DRAW;
-
 	boolean depthTest = false;
 
 	int polyFace = TGL11.GL_FRONT_AND_BACK;
@@ -90,7 +88,6 @@ public class TGLContext {
 			}
 
 			currentShader = shader;
-			System.out.println(currentShader);
 			return true;
 		}
 
@@ -134,6 +131,8 @@ public class TGLContext {
 		sb.append("\n");
 		sb.append("\tglClearColor(" + r + ", " + g + ", " + b + ", " + a + ")");
 		sb.append("\n");
+		sb.append("\tglViewport(" + vx + ", " + vy + ", " + vw + ", " + vh + ")");
+		sb.append("\n");
 		sb.append("\tdepthTest(" + depthTest + ")");
 		sb.append("\n");
 		sb.append("\tapplyCullFace(" + applyCullFace + ")");
@@ -149,6 +148,8 @@ public class TGLContext {
 		sb.append("\tglMatrixMode(" + matrixMode + ")");
 		sb.append("\n");
 		sb.append("\tmatrixStacks(" + matrixStacks + ")");
+		sb.append("\n");
+		sb.append("\tshaders(" + shaders + ")");
 		sb.append("\n");
 		sb.append("\tvertexColor(" + vertexColor + ")");
 		sb.append("\n");
