@@ -38,8 +38,13 @@ public class TGLContext {
 
 	int drawMode = TGL11.TGL_NO_DRAW;
 
+	boolean depthTest = false;
+
 	int polyFace = TGL11.GL_FRONT_AND_BACK;
 	int polyFill = TGL11.GL_FILL;
+
+	boolean applyCullFace = false;
+	int cullFace = TGL11.GL_BACK;
 
 	final Mesh mesh = new Mesh(600);
 
@@ -83,6 +88,16 @@ public class TGLContext {
 		var sb = new StringBuilder("TGLContext [");
 		sb.append("\n");
 		sb.append("\tglClearColor(" + r + ", " + g + ", " + b + ", " + a + ")");
+		sb.append("\n");
+		sb.append("\tdepthTest(" + depthTest + ")");
+		sb.append("\n");
+		sb.append("\tapplyCullFace(" + applyCullFace + ")");
+		sb.append("\n");
+		sb.append("\tcullFace(" + cullFace + ")");
+		sb.append("\n");
+		sb.append("\tpolyFace(" + polyFace + ")");
+		sb.append("\n");
+		sb.append("\tpolyFill(" + polyFill + ")");
 		sb.append("\n");
 		sb.append("\tglMatrixMode(" + matrixMode + ")");
 		sb.append("\n");

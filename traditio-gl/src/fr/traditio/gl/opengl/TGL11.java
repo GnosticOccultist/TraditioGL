@@ -12,6 +12,7 @@ public class TGL11 {
 	public static final int GL_COLOR_BUFFER_BIT = 0x4000;
 
 	public static final int GL_DEPTH_TEST = 0xB71;
+	public static final int GL_CULL_FACE = 0xB44;
 
 	static final int TGL_NO_DRAW = -1;
 	public static final int GL_POINTS = 0x0;
@@ -45,13 +46,29 @@ public class TGL11 {
 	public static final int GL_FILL = 0x1B02;
 
 	public static void glEnable(int target) {
-		TGLContext.checkContext();
-		GL11.glEnable(target);
+		var c = TGLContext.get();
+		if (target == GL_DEPTH_TEST && !c.depthTest) {
+			c.mesh.flush();
+			c.depthTest = true;
+			GL11.glEnable(target);
+		} else if (target == GL_CULL_FACE && !c.applyCullFace) {
+			c.mesh.flush();
+			c.applyCullFace = true;
+			GL11.glEnable(target);
+		}
 	}
 
 	public static void glDisable(int target) {
-		TGLContext.checkContext();
-		GL11.glDisable(target);
+		var c = TGLContext.get();
+		if (target == GL_DEPTH_TEST && c.depthTest) {
+			c.mesh.flush();
+			c.depthTest = false;
+			GL11.glDisable(target);
+		} else if (target == GL_CULL_FACE && c.applyCullFace) {
+			c.mesh.flush();
+			c.applyCullFace = false;
+			GL11.glDisable(target);
+		}
 	}
 
 	public static void glPolygonMode(int face, int mode) {
@@ -60,8 +77,18 @@ public class TGL11 {
 			c.mesh.flush();
 			c.polyFace = face;
 			c.polyFill = mode;
-			
+
 			GL11.glPolygonMode(face, mode);
+		}
+	}
+
+	public static void glCullFace(int mode) {
+		var c = TGLContext.get();
+		if (mode != c.cullFace) {
+			c.mesh.flush();
+			c.cullFace = mode;
+
+			GL11.glCullFace(mode);
 		}
 	}
 

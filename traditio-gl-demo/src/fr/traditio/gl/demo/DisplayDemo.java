@@ -20,6 +20,7 @@ public class DisplayDemo {
 		}
 
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_CULL_FACE);
 		glClearColor(0, 0, 0, 0);
 
 		loadMatrix();
