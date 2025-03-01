@@ -20,8 +20,11 @@ class Shader {
 
 	private int programId = INVALID_ID;
 
-	Shader(String name) {
+	DefineSet defines;
+
+	Shader(String name, DefineSet defines) {
 		this.name = name;
+		this.defines = defines;
 	}
 
 	public void uniformMat4(String name, Matrix4f value) {
@@ -32,6 +35,12 @@ class Shader {
 			value.get(buffer);
 			GL20.glUniformMatrix4fv(loc, false, buffer);
 		}
+	}
+
+	public void uniformi(String name, int v) {
+		use();
+		var loc = GL20.glGetUniformLocation(programId, name);
+		GL20.glUniform1i(loc, v);
 	}
 
 	public void uniform4f(String name, float x, float y, float z, float w) {
@@ -102,11 +111,28 @@ class Shader {
 		return id;
 	}
 
-	public static String readAsString(String path, Charset charset, String pattern) {
+	public String readAsString(String path, Charset charset, String pattern) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("#version 330 core");
+		sb.append('\n');
+
+		for (int i = 0; i < TGLContext.DEFINE_NAMES.size(); i++) {
+			if (!defines.isSet(i)) {
+				continue;
+			}
+
+			sb.append("#define ").append(TGLContext.DEFINE_NAMES.get(i)).append(' ');
+			sb.append('\n');
+		}
+
+		sb.append('\n');
+
 		try (var scanner = new Scanner(Shader.class.getResourceAsStream(path), charset.name())) {
 			var result = scanner.useDelimiter(pattern).next();
-			return result;
+			sb.append(result);
 		}
+
+		return sb.toString();
 	}
 
 	private void detachShader(int shaderId) {
@@ -134,5 +160,22 @@ class Shader {
 			GL20.glDeleteProgram(programId);
 			this.programId = INVALID_ID;
 		}
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Shader [name=" + name + ", programId=" + programId + ", defines=");
+		sb.append('\n');
+
+		for (int i = 0; i < TGLContext.DEFINE_NAMES.size(); i++) {
+			if (!defines.isSet(i)) {
+				continue;
+			}
+
+			sb.append("#define ").append(TGLContext.DEFINE_NAMES.get(i)).append(' ');
+			sb.append('\n');
+		}
+		return sb.toString();
 	}
 }

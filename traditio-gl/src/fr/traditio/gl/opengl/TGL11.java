@@ -1,6 +1,7 @@
 package fr.traditio.gl.opengl;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 
 public class TGL11 {
 
@@ -13,6 +14,7 @@ public class TGL11 {
 
 	public static final int GL_DEPTH_TEST = 0xB71;
 	public static final int GL_CULL_FACE = 0xB44;
+	public static final int GL_TEXTURE_2D = 0xDE1;
 
 	static final int TGL_NO_DRAW = -1;
 	public static final int GL_POINTS = 0x0;
@@ -55,6 +57,10 @@ public class TGL11 {
 			c.mesh.flush();
 			c.applyCullFace = true;
 			GL11.glEnable(target);
+		} else if (target == GL_TEXTURE_2D && !c.enableTex2D) {
+			c.mesh.flush();
+			c.enableTex2D = true;
+			c.changeDefine("USE_TEXTURE", true);
 		}
 	}
 
@@ -68,6 +74,19 @@ public class TGL11 {
 			c.mesh.flush();
 			c.applyCullFace = false;
 			GL11.glDisable(target);
+		} else if (target == GL_TEXTURE_2D && c.enableTex2D) {
+			c.mesh.flush();
+			c.enableTex2D = false;
+			c.changeDefine("USE_TEXTURE", false);
+		}
+	}
+
+	public static void glBindTexture(int target, int texture) {
+		var c = TGLContext.get();
+		if (c.boundTex2D != texture) {
+			GL13.glActiveTexture(GL13.GL_TEXTURE0);
+			GL11.glBindTexture(target, texture);
+			c.boundTex2D = texture;
 		}
 	}
 
@@ -170,6 +189,13 @@ public class TGL11 {
 		var c = TGLContext.get();
 		if (c.drawMode != mode) {
 			c.drawMode = mode;
+		}
+
+		if (c.boundTex2D == 0) {
+			// No bound texture in context, so ignore the define in shader.
+			c.changeDefine("USE_TEXTURE", false);
+		} else if (c.boundTex2D != 0 && c.enableTex2D) {
+			c.changeDefine("USE_TEXTURE", true);
 		}
 
 		c.prepareShader();

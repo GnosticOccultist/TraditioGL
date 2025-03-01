@@ -1,6 +1,8 @@
 package fr.traditio.gl.opengl;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.lwjgl.opengl.GLCapabilities;
@@ -12,6 +14,8 @@ import fr.traditio.gl.math.Vector3f;
 public class TGLContext {
 
 	private static final ThreadLocal<TGLContext> CONTEXT_LOCAL = new ThreadLocal<>();
+
+	public static final List<String> DEFINE_NAMES = Arrays.asList("USE_TEXTURE");
 
 	/**
 	 * The OpenGL context capabilities.
@@ -34,7 +38,13 @@ public class TGLContext {
 
 	final Vector3f vertexNorm = new Vector3f(0.0f, 0.0f, 0.0f);
 
-	final Shader shader = new Shader("base");
+	final DefineSet emptySet = new DefineSet(DEFINE_NAMES.size());
+
+	DefineSet currentSet;
+
+	Shader currentShader = null;
+
+	final Map<DefineSet, Shader> shaders = new HashMap<>();
 
 	int drawMode = TGL11.TGL_NO_DRAW;
 
@@ -48,6 +58,10 @@ public class TGLContext {
 
 	final Mesh mesh = new Mesh(600);
 
+	boolean enableTex2D = false;
+
+	int boundTex2D = 0;
+
 	TGLContext(GLCapabilities capabilities) {
 		this.capabilities = capabilities;
 		CONTEXT_LOCAL.set(this);
@@ -56,12 +70,40 @@ public class TGLContext {
 	}
 
 	private void initialize() {
+		emptySet.set(DEFINE_NAMES.indexOf("USE_TEXTURE"), false);
+		currentSet = new DefineSet(emptySet);
+
+		currentShader = new Shader("base", emptySet);
+		shaders.put(emptySet, currentShader);
+
 		prepareShader();
 	}
 
+	boolean changeDefine(String define, boolean value) {
+		var changed = currentSet.set(DEFINE_NAMES.indexOf(define), value);
+		if (changed) {
+			var shader = shaders.get(currentSet);
+			if (shader == null) {
+				var defines = new DefineSet(currentSet);
+				shader = new Shader("base", defines);
+				shaders.put(defines, shader);
+			}
+
+			currentShader = shader;
+			System.out.println(currentShader);
+			return true;
+		}
+
+		return false;
+	}
+
 	void prepareShader() {
-		shader.uniformMat4("projection", getOrCreateMatrixStack(TGL11.GL_PROJECTION).peek());
-		shader.uniformMat4("modelView", getOrCreateMatrixStack(TGL11.GL_MODELVIEW).peek());
+		currentShader.uniformMat4("projection", getOrCreateMatrixStack(TGL11.GL_PROJECTION).peek());
+		currentShader.uniformMat4("modelView", getOrCreateMatrixStack(TGL11.GL_MODELVIEW).peek());
+
+		if (boundTex2D != 0 && enableTex2D) {
+			currentShader.uniformi("texture_sampler", 0);
+		}
 	}
 
 	MatrixStack getOrCreateMatrixStack() {
@@ -79,7 +121,10 @@ public class TGLContext {
 	}
 
 	private void cleanup() {
-		shader.cleanup();
+		for (var shader : shaders.values()) {
+			shader.cleanup();
+		}
+
 		mesh.destroy();
 	}
 
@@ -98,6 +143,8 @@ public class TGLContext {
 		sb.append("\tpolyFace(" + polyFace + ")");
 		sb.append("\n");
 		sb.append("\tpolyFill(" + polyFill + ")");
+		sb.append("\n");
+		sb.append("\tenableTex2D(" + enableTex2D + ")");
 		sb.append("\n");
 		sb.append("\tglMatrixMode(" + matrixMode + ")");
 		sb.append("\n");

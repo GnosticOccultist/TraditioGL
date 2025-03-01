@@ -3,6 +3,8 @@ package fr.traditio.gl.demo;
 import fr.traditio.gl.TraditioGLException;
 import fr.traditio.gl.display.Display;
 import fr.traditio.gl.display.DisplayMode;
+import fr.traditio.gl.opengl.Texture;
+
 import static fr.traditio.gl.opengl.TGL11.*;
 
 public class DisplayDemo {
@@ -21,7 +23,11 @@ public class DisplayDemo {
 
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
+		glEnable(GL_TEXTURE_2D);
 		glClearColor(0, 0, 0, 0);
+
+		Texture tex = new Texture("/textures/wood.jpg");
+		glBindTexture(GL_TEXTURE_2D, tex.id());
 
 		loadMatrix();
 
@@ -40,64 +46,88 @@ public class DisplayDemo {
 
 			rotation = (rotation + 0.2f) % 360;
 
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
 			glBegin(GL_TRIANGLES);
-			glColor3f(0, 1, 0);
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(-0.5f, 0.5f, 0.5f);
+			glTexCoord2f(0.0f, 1.0f);
 			glVertex3f(-0.5f, -0.5f, 0.5f);
+			glTexCoord2f(1.0f, 0.0f);
 			glVertex3f(0.5f, 0.5f, 0.5f);
+			glTexCoord2f(1.0f, 0.0f);
 			glVertex3f(0.5f, 0.5f, 0.5f);
+			glTexCoord2f(0.0f, 1.0f);
 			glVertex3f(-0.5f, -0.5f, 0.5f);
+			glTexCoord2f(1.0f, 1.0f);
 			glVertex3f(0.5f, -0.5f, 0.5f);
 
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-			glColor3f(1, 0, 0);
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(-0.5f, 0.5f, -0.5f);
+			glTexCoord2f(0.0f, 1.0f);
 			glVertex3f(-0.5f, 0.5f, 0.5f);
+			glTexCoord2f(1.0f, 1.0f);
 			glVertex3f(0.5f, 0.5f, 0.5f);
+			glTexCoord2f(1.0f, 0.0f);
 			glVertex3f(0.5f, 0.5f, -0.5f);
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(-0.5f, 0.5f, -0.5f);
+			glTexCoord2f(1.0f, 1.0f);
 			glVertex3f(0.5f, 0.5f, 0.5f);
 
-			glColor3f(0, 0, 1);
+			glTexCoord2f(1.0f, 1.0f);
 			glVertex3f(0.5f, 0.5f, 0.5f);
+			glTexCoord2f(0.0f, 1.0f);
 			glVertex3f(0.5f, -0.5f, 0.5f);
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(0.5f, -0.5f, -0.5f);
+			glTexCoord2f(1.0f, 0.0f);
 			glVertex3f(0.5f, 0.5f, -0.5f);
+			glTexCoord2f(1.0f, 1.0f);
 			glVertex3f(0.5f, 0.5f, 0.5f);
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(0.5f, -0.5f, -0.5f);
 
-			glColor3f(0, 1, 1);
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(-0.5f, -0.5f, -0.5f);
+			glTexCoord2f(0.0f, 1.0f);
 			glVertex3f(-0.5f, -0.5f, 0.5f);
+			glTexCoord2f(1.0f, 1.0f);
 			glVertex3f(-0.5f, 0.5f, 0.5f);
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(-0.5f, -0.5f, -0.5f);
+			glTexCoord2f(1.0f, 1.0f);
 			glVertex3f(-0.5f, 0.5f, 0.5f);
+			glTexCoord2f(1.0f, 0.0f);
 			glVertex3f(-0.5f, 0.5f, -0.5f);
 
-			glColor3f(1, 1, 0);
+			glTexCoord2f(1.0f, 1.0f);
 			glVertex3f(0.5f, -0.5f, 0.5f);
+			glTexCoord2f(0.0f, 1.0f);
 			glVertex3f(-0.5f, -0.5f, 0.5f);
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(-0.5f, -0.5f, -0.5f);
+			glTexCoord2f(1.0f, 1.0f);
 			glVertex3f(0.5f, -0.5f, 0.5f);
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(-0.5f, -0.5f, -0.5f);
+			glTexCoord2f(1.0f, 0.0f);
 			glVertex3f(0.5f, -0.5f, -0.5f);
 
-			glColor3f(1, 0, 1);
+			glTexCoord2f(1.0f, 1.0f);
 			glVertex3f(0.5f, -0.5f, -0.5f);
+			glTexCoord2f(0.0f, 1.0f);
 			glVertex3f(-0.5f, -0.5f, -0.5f);
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(-0.5f, 0.5f, -0.5f);
+			glTexCoord2f(1.0f, 1.0f);
 			glVertex3f(0.5f, -0.5f, -0.5f);
+			glTexCoord2f(0.0f, 0.0f);
 			glVertex3f(-0.5f, 0.5f, -0.5f);
+			glTexCoord2f(1.0f, 0.0f);
 			glVertex3f(0.5f, 0.5f, -0.5f);
 
 			glEnd();
 
 			glRectf(-0.5f, 0.5f, 0.5F, -0.5f);
-
-			printContext();
 
 			Display.update();
 		}
