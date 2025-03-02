@@ -1,31 +1,10 @@
 package fr.traditio.gl.demo;
 
-import static fr.traditio.gl.opengl.TGL11.GL_COLOR_BUFFER_BIT;
-import static fr.traditio.gl.opengl.TGL11.GL_CULL_FACE;
-import static fr.traditio.gl.opengl.TGL11.GL_DEPTH_BUFFER_BIT;
-import static fr.traditio.gl.opengl.TGL11.GL_DEPTH_TEST;
-import static fr.traditio.gl.opengl.TGL11.GL_MODELVIEW;
-import static fr.traditio.gl.opengl.TGL11.GL_PROJECTION;
-import static fr.traditio.gl.opengl.TGL11.GL_TEXTURE_2D;
-import static fr.traditio.gl.opengl.TGL11.GL_TRIANGLES;
-import static fr.traditio.gl.opengl.TGL11.glBegin;
-import static fr.traditio.gl.opengl.TGL11.glBindTexture;
-import static fr.traditio.gl.opengl.TGL11.glClear;
-import static fr.traditio.gl.opengl.TGL11.glClearColor;
-import static fr.traditio.gl.opengl.TGL11.glEnable;
-import static fr.traditio.gl.opengl.TGL11.glEnd;
-import static fr.traditio.gl.opengl.TGL11.glLoadIdentity;
-import static fr.traditio.gl.opengl.TGL11.glMatrixMode;
-import static fr.traditio.gl.opengl.TGL11.glRotatef;
-import static fr.traditio.gl.opengl.TGL11.glTexCoord2f;
-import static fr.traditio.gl.opengl.TGL11.glTranslatef;
-import static fr.traditio.gl.opengl.TGL11.glVertex3f;
-import static fr.traditio.gl.opengl.TGL11.glViewport;
-import static fr.traditio.gl.opengl.TGL11.gluPerspective;
+import static fr.traditio.gl.opengl.TGL11.*;
+
 import fr.traditio.gl.TraditioGLException;
 import fr.traditio.gl.display.Display;
 import fr.traditio.gl.display.DisplayMode;
-import fr.traditio.gl.opengl.TGL11;
 import fr.traditio.gl.opengl.Texture;
 
 public class HelloTraditioGL {
@@ -47,6 +26,10 @@ public class HelloTraditioGL {
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_TEXTURE_2D);
+		glEnable(GL_FOG);
+		glFogi(GL_FOG_MODE, GL_EXP2);
+		glFogf(GL_FOG_DENSITY, 0.095f);
+		glFogfv(GL_FOG_COLOR, new float[] { 0.5f, 0.2f, 0.2f, 1.0f });
 
 		// Define clear color to black no alpha (default).
 		glClearColor(0, 0, 0, 0);
@@ -72,7 +55,7 @@ public class HelloTraditioGL {
 			// Load model view matrix, translate and rotate it.
 			glMatrixMode(GL_MODELVIEW);
 			glLoadIdentity();
-			glTranslatef(0, 0, -2);
+			glTranslatef(0, 0, -5);
 			glRotatef((float) Math.toRadians(rotation), 1.0f, 1.0f, 1.0f);
 
 			// Update rotation for next loop.
@@ -160,6 +143,8 @@ public class HelloTraditioGL {
 
 			// Finish draw command and send vertex data to GPU.
 			glEnd();
+			
+			///printContext();
 
 			// Update display, swap buffers.
 			Display.update();

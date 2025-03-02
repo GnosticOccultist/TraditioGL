@@ -43,6 +43,18 @@ class Shader {
 		GL20.glUniform1i(loc, v);
 	}
 
+	public void uniformf(String name, float v) {
+		use();
+		var loc = GL20.glGetUniformLocation(programId, name);
+		GL20.glUniform1f(loc, v);
+	}
+
+	public void uniform2f(String name, float x, float y) {
+		use();
+		var loc = GL20.glGetUniformLocation(programId, name);
+		GL20.glUniform2f(loc, x, y);
+	}
+
 	public void uniform4f(String name, float x, float y, float z, float w) {
 		use();
 		var loc = GL20.glGetUniformLocation(programId, name);
@@ -131,6 +143,8 @@ class Shader {
 			var result = scanner.useDelimiter(pattern).next();
 			sb.append(result);
 		}
+		
+		System.out.println(sb.toString());
 
 		return sb.toString();
 	}

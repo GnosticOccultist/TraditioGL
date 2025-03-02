@@ -15,7 +15,8 @@ public class TGLContext {
 
 	private static final ThreadLocal<TGLContext> CONTEXT_LOCAL = new ThreadLocal<>();
 
-	public static final List<String> DEFINE_NAMES = Arrays.asList("USE_TEXTURE");
+	public static final List<String> DEFINE_NAMES = Arrays.asList("USE_TEXTURE", "USE_FOG", "FOG_LINEAR", "FOG_EXP",
+			"FOG_EXP2");
 
 	/**
 	 * The OpenGL context capabilities.
@@ -60,6 +61,13 @@ public class TGLContext {
 
 	int boundTex2D = 0;
 
+	boolean enableFog = false;
+	int fogMode = TGL11.GL_EXP;
+	Color4f fogColor = new Color4f(0.0f, 0.0f, 0.0f, 0.0f);
+	float fogDensity = 1.0f;
+	float fogStart = 0.0f;
+	float fogEnd = 1.0f;
+
 	TGLContext(GLCapabilities capabilities) {
 		this.capabilities = capabilities;
 		CONTEXT_LOCAL.set(this);
@@ -69,8 +77,12 @@ public class TGLContext {
 
 	private void initialize() {
 		mesh = new Mesh(600, capabilities);
-		
+
 		emptySet.set(DEFINE_NAMES.indexOf("USE_TEXTURE"), false);
+		emptySet.set(DEFINE_NAMES.indexOf("USE_FOG"), false);
+		emptySet.set(DEFINE_NAMES.indexOf("FOG_LINEAR"), false);
+		emptySet.set(DEFINE_NAMES.indexOf("FOG_EXP"), true);
+		emptySet.set(DEFINE_NAMES.indexOf("FOG_EXP2"), false);
 		currentSet = new DefineSet(emptySet);
 
 		currentShader = new Shader("base", emptySet);
@@ -102,6 +114,15 @@ public class TGLContext {
 
 		if (boundTex2D != 0 && enableTex2D) {
 			currentShader.uniformi("texture_sampler", 0);
+		}
+
+		if (enableFog) {
+			currentShader.uniform4f("fogColor", fogColor.r(), fogColor.g(), fogColor.b(), fogColor.a());
+			if (fogMode == TGL11.GL_LINEAR) {
+				currentShader.uniform2f("fogLinearRange", fogStart, fogEnd);
+			} else if (fogMode == TGL11.GL_EXP || fogMode == TGL11.GL_EXP2) {
+				currentShader.uniformf("fogDensity", fogDensity);
+			}
 		}
 	}
 
@@ -153,7 +174,7 @@ public class TGLContext {
 		sb.append("\n");
 		sb.append("\tmatrixStacks(" + matrixStacks + ")");
 		sb.append("\n");
-		sb.append("\tshaders(" + shaders + ")");
+		sb.append("\tcurrentShader(" + currentShader + ")");
 		sb.append("\n");
 		sb.append("\tvertexColor(" + vertexColor + ")");
 		sb.append("\n");

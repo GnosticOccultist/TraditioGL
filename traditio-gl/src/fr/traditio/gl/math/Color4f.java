@@ -30,6 +30,14 @@ public final class Color4f {
 		return this;
 	}
 
+	public boolean equalsArray(float[] array) {
+		if (r != array[0] || g != array[1] || b != array[2] || a != array[3]) {
+			return false;
+		}
+
+		return true;
+	}
+
 	public float r() {
 		return r;
 	}

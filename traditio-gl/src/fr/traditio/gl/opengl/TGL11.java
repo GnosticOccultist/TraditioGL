@@ -64,6 +64,17 @@ public class TGL11 {
 	public static final int GL_RGB = 0x1907;
 	public static final int GL_RGBA = 0x1908;
 
+	public static final int GL_FOG = 0xB60;
+	public static final int GL_FOG_INDEX = 0xB61;
+	public static final int GL_FOG_DENSITY = 0xB62;
+	public static final int GL_FOG_START = 0xB63;
+	public static final int GL_FOG_END = 0xB64;
+	public static final int GL_FOG_MODE = 0xB65;
+	public static final int GL_FOG_COLOR = 0xB66;
+
+	public static final int GL_EXP = 0x800;
+	public static final int GL_EXP2 = 0x801;
+
 	public static final int GL_NEAREST = 0x2600;
 	public static final int GL_LINEAR = 0x2601;
 
@@ -97,6 +108,10 @@ public class TGL11 {
 			c.mesh.flush();
 			c.enableTex2D = true;
 			c.changeDefine("USE_TEXTURE", true);
+		} else if (target == GL_FOG && !c.enableFog) {
+			c.mesh.flush();
+			c.enableFog = true;
+			c.changeDefine("USE_FOG", true);
 		}
 	}
 
@@ -114,6 +129,97 @@ public class TGL11 {
 			c.mesh.flush();
 			c.enableTex2D = false;
 			c.changeDefine("USE_TEXTURE", false);
+		} else if (target == GL_FOG && c.enableFog) {
+			c.mesh.flush();
+			c.enableFog = false;
+			c.changeDefine("USE_FOG", false);
+		}
+	}
+
+	public static void glFogi(int pname, int param) {
+		var c = TGLContext.get();
+		var changed = false;
+		switch (pname) {
+		case GL_FOG_MODE:
+			changed = c.fogMode != param;
+			c.fogMode = (int) param;
+			if (changed) {
+				// TODO: Improve this mess.
+				if (c.fogMode == GL_LINEAR) {
+					c.changeDefine("FOG_LINEAR", true);
+					c.changeDefine("FOG_EXP", false);
+					c.changeDefine("FOG_EXP2", false);
+				} else if (c.fogMode == GL_EXP) {
+					c.changeDefine("FOG_LINEAR", false);
+					c.changeDefine("FOG_EXP", true);
+					c.changeDefine("FOG_EXP2", false);
+				} else if (c.fogMode == GL_EXP2) {
+					c.changeDefine("FOG_LINEAR", false);
+					c.changeDefine("FOG_EXP", false);
+					c.changeDefine("FOG_EXP2", true);
+				}
+			}
+			break;
+		case GL_FOG_DENSITY:
+			changed = c.fogDensity != param;
+			c.fogDensity = param;
+			break;
+		case GL_FOG_START:
+			changed = c.fogStart != param;
+			c.fogStart = param;
+			break;
+		case GL_FOG_END:
+			changed = c.fogEnd != param;
+			c.fogEnd = param;
+			break;
+		}
+	}
+
+	public static void glFogf(int pname, float param) {
+		var c = TGLContext.get();
+		var changed = false;
+		switch (pname) {
+		case GL_FOG_MODE:
+			changed = c.fogMode != param;
+			c.fogMode = (int) param;
+			if (changed) {
+				// TODO: Improve this mess.
+				if (c.fogMode == GL_LINEAR) {
+					c.changeDefine("FOG_LINEAR", true);
+					c.changeDefine("FOG_EXP", false);
+					c.changeDefine("FOG_EXP2", false);
+				} else if (c.fogMode == GL_EXP) {
+					c.changeDefine("FOG_LINEAR", false);
+					c.changeDefine("FOG_EXP", true);
+					c.changeDefine("FOG_EXP2", false);
+				} else if (c.fogMode == GL_EXP2) {
+					c.changeDefine("FOG_LINEAR", false);
+					c.changeDefine("FOG_EXP", false);
+					c.changeDefine("FOG_EXP2", true);
+				}
+			}
+			break;
+		case GL_FOG_DENSITY:
+			changed = c.fogDensity != param;
+			c.fogDensity = param;
+			break;
+		case GL_FOG_START:
+			changed = c.fogStart != param;
+			c.fogStart = param;
+			break;
+		case GL_FOG_END:
+			changed = c.fogEnd != param;
+			c.fogEnd = param;
+			break;
+		}
+	}
+
+	public static void glFogfv(int pname, float[] param) {
+		var c = TGLContext.get();
+		switch (pname) {
+		case GL_FOG_COLOR:
+			c.fogColor.set(param[0], param[1], param[2], param[3]);
+			break;
 		}
 	}
 
