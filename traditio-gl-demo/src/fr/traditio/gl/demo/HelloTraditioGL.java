@@ -5,7 +5,6 @@ import static fr.traditio.gl.opengl.TGL11.*;
 import fr.traditio.gl.TraditioGLException;
 import fr.traditio.gl.display.Display;
 import fr.traditio.gl.display.DisplayMode;
-import fr.traditio.gl.opengl.Texture;
 
 public class HelloTraditioGL {
 

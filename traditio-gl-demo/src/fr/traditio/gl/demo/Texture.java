@@ -1,4 +1,4 @@
-package fr.traditio.gl.opengl;
+package fr.traditio.gl.demo;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
