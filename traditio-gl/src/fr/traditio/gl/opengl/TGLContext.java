@@ -16,7 +16,7 @@ public class TGLContext {
 	private static final ThreadLocal<TGLContext> CONTEXT_LOCAL = new ThreadLocal<>();
 
 	public static final List<String> DEFINE_NAMES = Arrays.asList("USE_TEXTURE", "USE_FOG", "FOG_LINEAR", "FOG_EXP",
-			"FOG_EXP2");
+			"FOG_EXP2", "USE_FOG_COORD");
 
 	/**
 	 * The OpenGL context capabilities.
@@ -67,6 +67,8 @@ public class TGLContext {
 	float fogDensity = 1.0f;
 	float fogStart = 0.0f;
 	float fogEnd = 1.0f;
+	boolean useFogCoord = false;
+	float fogCoord = 0.0f;
 
 	TGLContext(GLCapabilities capabilities) {
 		this.capabilities = capabilities;
@@ -83,6 +85,7 @@ public class TGLContext {
 		emptySet.set(DEFINE_NAMES.indexOf("FOG_LINEAR"), false);
 		emptySet.set(DEFINE_NAMES.indexOf("FOG_EXP"), true);
 		emptySet.set(DEFINE_NAMES.indexOf("FOG_EXP2"), false);
+		emptySet.set(DEFINE_NAMES.indexOf("USE_FOG_COORD"), false);
 		currentSet = new DefineSet(emptySet);
 
 		currentShader = new Shader("base", emptySet);

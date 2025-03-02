@@ -1,5 +1,8 @@
 package fr.traditio.gl.math;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
 public final class Color4f {
 
 	private float r, g, b, a;
@@ -27,6 +30,22 @@ public final class Color4f {
 		this.g = g;
 		this.b = b;
 		this.a = a;
+		return this;
+	}
+
+	public Color4f set(FloatBuffer buffer) {
+		this.r = buffer.get();
+		this.g = buffer.get();
+		this.b = buffer.get();
+		this.a = buffer.get();
+		return this;
+	}
+
+	public Color4f set(IntBuffer buffer) {
+		this.r = buffer.get();
+		this.g = buffer.get();
+		this.b = buffer.get();
+		this.a = buffer.get();
 		return this;
 	}
 

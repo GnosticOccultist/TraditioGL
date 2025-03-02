@@ -27,25 +27,30 @@ public class DirectVertexProcessor implements VertexProcessor {
 
 		GL45.glNamedBufferData(vbo, size, GL15.GL_DYNAMIC_DRAW);
 
-		GL45.glVertexArrayVertexBuffer(vao, 0, vbo, 0, 12 * Float.BYTES);
+		GL45.glVertexArrayVertexBuffer(vao, 0, vbo, 0, 13 * Float.BYTES);
 		GL45.glEnableVertexArrayAttrib(vao, 0);
 		GL45.glVertexArrayAttribFormat(vao, 0, 3, GL11.GL_FLOAT, false, 0);
 		GL45.glVertexArrayAttribBinding(vao, 0, 0);
-		
-		GL45.glVertexArrayVertexBuffer(vao, 1, vbo, 3 * Float.BYTES, 12 * Float.BYTES);
+
+		GL45.glVertexArrayVertexBuffer(vao, 1, vbo, 3 * Float.BYTES, 13 * Float.BYTES);
 		GL45.glEnableVertexArrayAttrib(vao, 1);
 		GL45.glVertexArrayAttribFormat(vao, 1, 4, GL11.GL_FLOAT, true, 3 * Float.BYTES);
 		GL45.glVertexArrayAttribBinding(vao, 1, 0);
-		
-		GL45.glVertexArrayVertexBuffer(vao, 2, vbo, 7 * Float.BYTES, 12 * Float.BYTES);
+
+		GL45.glVertexArrayVertexBuffer(vao, 2, vbo, 7 * Float.BYTES, 13 * Float.BYTES);
 		GL45.glEnableVertexArrayAttrib(vao, 2);
 		GL45.glVertexArrayAttribFormat(vao, 2, 2, GL11.GL_FLOAT, false, 7 * Float.BYTES);
 		GL45.glVertexArrayAttribBinding(vao, 2, 0);
-		
-		GL45.glVertexArrayVertexBuffer(vao, 3, vbo, 9 * Float.BYTES, 12 * Float.BYTES);
+
+		GL45.glVertexArrayVertexBuffer(vao, 3, vbo, 9 * Float.BYTES, 13 * Float.BYTES);
 		GL45.glEnableVertexArrayAttrib(vao, 3);
 		GL45.glVertexArrayAttribFormat(vao, 3, 3, GL11.GL_FLOAT, false, 9 * Float.BYTES);
 		GL45.glVertexArrayAttribBinding(vao, 3, 0);
+
+		GL45.glVertexArrayVertexBuffer(vao, 4, vbo, 12 * Float.BYTES, 13 * Float.BYTES);
+		GL45.glEnableVertexArrayAttrib(vao, 4);
+		GL45.glVertexArrayAttribFormat(vao, 4, 1, GL11.GL_FLOAT, false, 12 * Float.BYTES);
+		GL45.glVertexArrayAttribBinding(vao, 4, 0);
 
 		this.allocatedSize = size;
 	}
@@ -70,9 +75,11 @@ public class DirectVertexProcessor implements VertexProcessor {
 		GL45.glEnableVertexArrayAttrib(vao, 1);
 		GL45.glEnableVertexArrayAttrib(vao, 2);
 		GL45.glEnableVertexArrayAttrib(vao, 3);
+		GL45.glEnableVertexArrayAttrib(vao, 4);
 
 		GL15.glDrawArrays(mode.toGLMode(), 0, amount);
 
+		GL45.glDisableVertexArrayAttrib(vao, 4);
 		GL45.glDisableVertexArrayAttrib(vao, 3);
 		GL45.glDisableVertexArrayAttrib(vao, 2);
 		GL45.glDisableVertexArrayAttrib(vao, 1);

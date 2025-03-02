@@ -143,7 +143,7 @@ class Shader {
 			var result = scanner.useDelimiter(pattern).next();
 			sb.append(result);
 		}
-		
+
 		System.out.println(sb.toString());
 
 		return sb.toString();

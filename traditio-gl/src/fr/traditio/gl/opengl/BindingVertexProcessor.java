@@ -29,17 +29,20 @@ public class BindingVertexProcessor implements VertexProcessor {
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
 		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, size, GL15.GL_DYNAMIC_DRAW);
 
-		GL30.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 12 * Float.BYTES, 0);
+		GL30.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 13 * Float.BYTES, 0);
 		GL30.glEnableVertexAttribArray(0);
 
-		GL30.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, true, 12 * Float.BYTES, 3 * Float.BYTES);
+		GL30.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, true, 13 * Float.BYTES, 3 * Float.BYTES);
 		GL30.glEnableVertexAttribArray(1);
 
-		GL30.glVertexAttribPointer(2, 2, GL11.GL_FLOAT, false, 12 * Float.BYTES, 7 * Float.BYTES);
+		GL30.glVertexAttribPointer(2, 2, GL11.GL_FLOAT, false, 13 * Float.BYTES, 7 * Float.BYTES);
 		GL30.glEnableVertexAttribArray(2);
 
-		GL30.glVertexAttribPointer(3, 3, GL11.GL_FLOAT, false, 12 * Float.BYTES, 9 * Float.BYTES);
+		GL30.glVertexAttribPointer(3, 3, GL11.GL_FLOAT, false, 13 * Float.BYTES, 9 * Float.BYTES);
 		GL30.glEnableVertexAttribArray(3);
+
+		GL30.glVertexAttribPointer(4, 1, GL11.GL_FLOAT, false, 13 * Float.BYTES, 12 * Float.BYTES);
+		GL30.glEnableVertexAttribArray(4);
 
 		this.allocatedSize = size;
 	}
@@ -67,6 +70,7 @@ public class BindingVertexProcessor implements VertexProcessor {
 		GL30.glEnableVertexAttribArray(1);
 		GL30.glEnableVertexAttribArray(2);
 		GL30.glEnableVertexAttribArray(3);
+		GL30.glEnableVertexAttribArray(4);
 
 		GL15.glDrawArrays(mode.toGLMode(), 0, amount);
 
@@ -74,6 +78,7 @@ public class BindingVertexProcessor implements VertexProcessor {
 		GL30.glDisableVertexAttribArray(1);
 		GL30.glDisableVertexAttribArray(2);
 		GL30.glDisableVertexAttribArray(3);
+		GL30.glDisableVertexAttribArray(4);
 		GL30.glBindVertexArray(0);
 	}
 

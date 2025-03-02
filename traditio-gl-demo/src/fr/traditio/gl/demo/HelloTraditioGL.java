@@ -1,6 +1,9 @@
 package fr.traditio.gl.demo;
 
 import static fr.traditio.gl.opengl.TGL11.*;
+import static fr.traditio.gl.opengl.TGL14.*;
+
+import org.lwjgl.system.MemoryStack;
 
 import fr.traditio.gl.TraditioGLException;
 import fr.traditio.gl.display.Display;
@@ -27,8 +30,14 @@ public class HelloTraditioGL {
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_FOG);
 		glFogi(GL_FOG_MODE, GL_EXP2);
-		glFogf(GL_FOG_DENSITY, 0.095f);
-		glFogfv(GL_FOG_COLOR, new float[] { 0.5f, 0.2f, 0.2f, 1.0f });
+		glFogf(GL_FOG_DENSITY, 0.25f);
+		glFogi(GL_FOG_COORDINATE_SOURCE, GL_FOG_COORDINATE);
+
+		try (var stack = MemoryStack.stackPush()) {
+			var buffer = stack.floats(0.7f, 0.2f, 0.7f, 1.0f);
+			buffer.rewind();
+			glFogfv(GL_FOG_COLOR, buffer);
+		}
 
 		// Define clear color to black no alpha (default).
 		glClearColor(0, 0, 0, 0);
@@ -142,8 +151,6 @@ public class HelloTraditioGL {
 
 			// Finish draw command and send vertex data to GPU.
 			glEnd();
-			
-			///printContext();
 
 			// Update display, swap buffers.
 			Display.update();

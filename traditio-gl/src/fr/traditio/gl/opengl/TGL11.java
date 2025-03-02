@@ -1,5 +1,6 @@
 package fr.traditio.gl.opengl;
 
+import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import org.lwjgl.opengl.GL11;
@@ -214,11 +215,38 @@ public class TGL11 {
 		}
 	}
 
-	public static void glFogfv(int pname, float[] param) {
+	public static void glFogfv(int pname, float[] params) {
 		var c = TGLContext.get();
 		switch (pname) {
 		case GL_FOG_COLOR:
-			c.fogColor.set(param[0], param[1], param[2], param[3]);
+			c.fogColor.set(params[0], params[1], params[2], params[3]);
+			break;
+		}
+	}
+
+	public static void glFogfv(int pname, FloatBuffer params) {
+		var c = TGLContext.get();
+		switch (pname) {
+		case GL_FOG_COLOR:
+			c.fogColor.set(params);
+			break;
+		}
+	}
+
+	public static void glFogiv(int pname, int[] params) {
+		var c = TGLContext.get();
+		switch (pname) {
+		case GL_FOG_COLOR:
+			c.fogColor.set(params[0], params[1], params[2], params[3]);
+			break;
+		}
+	}
+
+	public static void glFogiv(int pname, IntBuffer params) {
+		var c = TGLContext.get();
+		switch (pname) {
+		case GL_FOG_COLOR:
+			c.fogColor.set(params);
 			break;
 		}
 	}
@@ -415,22 +443,28 @@ public class TGL11 {
 		c.vertexNorm.set(nx, ny, nz);
 	}
 
+	public static void glVertex2f(float x, float y) {
+		var c = TGLContext.get();
+		var m = c.mesh;
+		m.putVertex(x, y, c.vertexColor, c.vertexTex, c.vertexNorm, c.fogCoord);
+	}
+
 	public static void glVertex3f(float x, float y, float z) {
 		var c = TGLContext.get();
 		var m = c.mesh;
-		m.putVertex(x, y, z, c.vertexColor, c.vertexTex, c.vertexNorm);
+		m.putVertex(x, y, z, c.vertexColor, c.vertexTex, c.vertexNorm, c.fogCoord);
 	}
 
 	public static void glRectf(float x1, float y1, float x2, float y2) {
 		var c = TGLContext.get();
 		var m = c.mesh;
 		glBegin(GL_TRIANGLES);
-		m.putVertex(x1, y1, 0, c.vertexColor);
-		m.putVertex(x1, y2, 0, c.vertexColor);
-		m.putVertex(x2, y1, 0, c.vertexColor);
-		m.putVertex(x2, y1, 0, c.vertexColor);
-		m.putVertex(x1, y2, 0, c.vertexColor);
-		m.putVertex(x2, y2, 0, c.vertexColor);
+		m.putVertex(x1, y1, c.vertexColor, c.vertexTex, c.vertexNorm, c.fogCoord);
+		m.putVertex(x1, y2, c.vertexColor, c.vertexTex, c.vertexNorm, c.fogCoord);
+		m.putVertex(x2, y1, c.vertexColor, c.vertexTex, c.vertexNorm, c.fogCoord);
+		m.putVertex(x2, y1, c.vertexColor, c.vertexTex, c.vertexNorm, c.fogCoord);
+		m.putVertex(x1, y2, c.vertexColor, c.vertexTex, c.vertexNorm, c.fogCoord);
+		m.putVertex(x2, y2, c.vertexColor, c.vertexTex, c.vertexNorm, c.fogCoord);
 		glEnd();
 	}
 

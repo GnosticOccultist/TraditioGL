@@ -7,7 +7,7 @@ import fr.traditio.gl.math.Vector3f;
 
 class Mesh {
 
-	protected static final int VERTEX_SIZE = 3 + 4 + 2 + 3;
+	protected static final int VERTEX_SIZE = 3 + 4 + 2 + 3 + 1;
 
 	protected static final int SPRITE_SIZE = 4 * VERTEX_SIZE;
 
@@ -25,7 +25,7 @@ class Mesh {
 
 	protected Mesh(int capacity, GLCapabilities capabilities) {
 		this.vertices = new float[capacity * SPRITE_SIZE];
-		
+
 		// DSA support.
 		if (capabilities.OpenGL45 || capabilities.GL_ARB_direct_state_access) {
 			this.processor = new DirectVertexProcessor();
@@ -60,8 +60,12 @@ class Mesh {
 		return false;
 	}
 
-	protected void putVertex(float x, float y, float z, Color4f c, Vector3f t, Vector3f n) {
-		ensureCapacity(12);
+	protected void putVertex(float x, float y, Color4f c, Vector3f t, Vector3f n, float fogCoord) {
+		putVertex(x, y, 0, c, t, n, fogCoord);
+	}
+
+	protected void putVertex(float x, float y, float z, Color4f c, Vector3f t, Vector3f n, float fogCoord) {
+		ensureCapacity(13);
 
 		vertices[currentIndex] = x;
 		vertices[currentIndex + 1] = y;
@@ -75,17 +79,22 @@ class Mesh {
 		vertices[currentIndex + 9] = n.x();
 		vertices[currentIndex + 10] = n.y();
 		vertices[currentIndex + 11] = n.z();
+		vertices[currentIndex + 12] = fogCoord;
 
-		this.currentIndex += 12;
+		this.currentIndex += 13;
+	}
+
+	protected void putVertex(float x, float y, Color4f c) {
+		putVertex(x, y, 0, c);
 	}
 
 	protected void putVertex(float x, float y, float z, Color4f c) {
-		putVertex(x, y, z, c.r(), c.g(), c.b(), c.a(), 0, 0, 0, 0, 0);
+		putVertex(x, y, z, c.r(), c.g(), c.b(), c.a(), 0, 0, 0, 0, 0, 0);
 	}
 
 	protected void putVertex(float x, float y, float z, float r, float g, float b, float a, float s, float t, float nx,
-			float ny, float nz) {
-		ensureCapacity(12);
+			float ny, float nz, float fogCoord) {
+		ensureCapacity(13);
 
 		vertices[currentIndex] = x;
 		vertices[currentIndex + 1] = y;
@@ -99,8 +108,9 @@ class Mesh {
 		vertices[currentIndex + 9] = nx;
 		vertices[currentIndex + 10] = ny;
 		vertices[currentIndex + 11] = nz;
+		vertices[currentIndex + 12] = fogCoord;
 
-		this.currentIndex += 12;
+		this.currentIndex += 13;
 	}
 
 	public void flush() {
