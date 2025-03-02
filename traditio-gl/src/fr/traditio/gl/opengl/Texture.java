@@ -2,12 +2,12 @@ package fr.traditio.gl.opengl;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.IntBuffer;
-
 import javax.imageio.ImageIO;
 
-import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.system.MemoryUtil;
+
+import static fr.traditio.gl.opengl.TGL11.*;
 
 public final class Texture {
 
@@ -37,18 +37,19 @@ public final class Texture {
 			data[i] = a << 24 | b << 16 | g << 8 | r;
 		}
 
-		int id = GL11.glGenTextures();
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
+		int id = glGenTextures();
+		glBindTexture(GL_TEXTURE_2D, id);
 
-		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-
-		IntBuffer buffer = BufferUtils.createIntBuffer(data.length);
+		var buffer = MemoryUtil.memAllocInt(data.length);
 		buffer.put(data);
 		buffer.flip();
 
-		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE,
-				buffer);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+		
+		MemoryUtil.memFree(buffer);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		this.id = id;
 	}
@@ -58,7 +59,7 @@ public final class Texture {
 	}
 
 	public void cleanup() {
-		GL11.glDeleteTextures(id);
+		glDeleteTextures(id);
 		this.id = -1;
 	}
 }

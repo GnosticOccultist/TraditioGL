@@ -1,7 +1,10 @@
 package fr.traditio.gl.opengl;
 
+import java.nio.IntBuffer;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
+import org.lwjgl.opengl.GL45;
 
 public class TGL11 {
 
@@ -42,9 +45,43 @@ public class TGL11 {
 	public static final int GL_AUX2 = 0x40B;
 	public static final int GL_AUX3 = 0x40C;
 
+	public static final int GL_BYTE = 0x1400;
+	public static final int GL_UNSIGNED_BYTE = 0x1401;
+	public static final int GL_SHORT = 0x1402;
+	public static final int GL_UNSIGNED_SHORT = 0x1403;
+	public static final int GL_INT = 0x1404;
+	public static final int GL_UNSIGNED_INT = 0x1405;
+	public static final int GL_FLOAT = 0x1406;
+	public static final int GL_2_BYTES = 0x1407;
+	public static final int GL_3_BYTES = 0x1408;
+	public static final int GL_4_BYTES = 0x1409;
+	public static final int GL_DOUBLE = 0x140A;
+
 	public static final int GL_POINT = 0x1B00;
 	public static final int GL_LINE = 0x1B01;
 	public static final int GL_FILL = 0x1B02;
+
+	public static final int GL_RGB = 0x1907;
+	public static final int GL_RGBA = 0x1908;
+
+	public static final int GL_NEAREST = 0x2600;
+	public static final int GL_LINEAR = 0x2601;
+
+	public static final int GL_NEAREST_MIPMAP_NEAREST = 0x2700;
+	public static final int GL_LINEAR_MIPMAP_NEAREST = 0x2701;
+	public static final int GL_NEAREST_MIPMAP_LINEAR = 0x2702;
+	public static final int GL_LINEAR_MIPMAP_LINEAR = 0x2703;
+
+	public static final int GL_TEXTURE_MAG_FILTER = 0x2800;
+	public static final int GL_TEXTURE_MIN_FILTER = 0x2801;
+	public static final int GL_TEXTURE_WRAP_S = 0x2802;
+	public static final int GL_TEXTURE_WRAP_T = 0x2803;
+
+	public static final int GL_RGBA8 = 0x8058;
+
+	protected TGL11() {
+		throw new UnsupportedOperationException();
+	}
 
 	public static void glEnable(int target) {
 		var c = TGLContext.get();
@@ -80,12 +117,59 @@ public class TGL11 {
 		}
 	}
 
+	public static int glGenTextures() {
+		var c = TGLContext.get();
+		var id = -1;
+		if (c.capabilities.OpenGL45 || c.capabilities.GL_ARB_direct_state_access) {
+			id = GL45.glCreateTextures(GL_TEXTURE_2D);
+		} else {
+			id = GL11.glGenTextures();
+		}
+
+		return id;
+	}
+
+	public static void glDeleteTextures(int texture) {
+		var c = TGLContext.get();
+
+		GL11.glDeleteTextures(texture);
+
+		if (c.boundTex2D == texture) {
+			c.boundTex2D = 0;
+		}
+	}
+
 	public static void glBindTexture(int target, int texture) {
 		var c = TGLContext.get();
 		if (c.boundTex2D != texture) {
-			GL13.glActiveTexture(GL13.GL_TEXTURE0);
-			GL11.glBindTexture(target, texture);
-			c.boundTex2D = texture;
+			if (c.capabilities.OpenGL45 || c.capabilities.GL_ARB_direct_state_access) {
+				GL45.glBindTextureUnit(0, texture);
+			} else {
+				GL13.glActiveTexture(GL13.GL_TEXTURE0);
+				GL11.glBindTexture(target, texture);
+			}
+		}
+
+		c.boundTex2D = texture;
+	}
+
+	public static void glTexParameteri(int target, int pname, int param) {
+		var c = TGLContext.get();
+		if (c.capabilities.OpenGL45 || c.capabilities.GL_ARB_direct_state_access) {
+			GL45.glTextureParameteri(c.boundTex2D, pname, param);
+		} else {
+			GL11.glTexParameteri(target, pname, param);
+		}
+	}
+
+	public static void glTexImage2D(int target, int level, int internalformat, int width, int height, int border,
+			int format, int type, IntBuffer pixels) {
+		var c = TGLContext.get();
+		if (c.capabilities.OpenGL45 || c.capabilities.GL_ARB_direct_state_access) {
+			GL45.glTextureStorage2D(c.boundTex2D, 1, internalformat, width, height);
+			GL45.glTextureSubImage2D(c.boundTex2D, level, 0, 0, width, height, format, type, pixels);
+		} else {
+			GL11.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
 		}
 	}
 
@@ -235,12 +319,12 @@ public class TGL11 {
 		var c = TGLContext.get();
 		var m = c.mesh;
 		glBegin(GL_TRIANGLES);
-		m.putVertex(x1, y1, -1, c.vertexColor);
-		m.putVertex(x1, y2, -1, c.vertexColor);
-		m.putVertex(x2, y1, -1, c.vertexColor);
-		m.putVertex(x2, y1, -1, c.vertexColor);
-		m.putVertex(x1, y2, -1, c.vertexColor);
-		m.putVertex(x2, y2, -1, c.vertexColor);
+		m.putVertex(x1, y1, 0, c.vertexColor);
+		m.putVertex(x1, y2, 0, c.vertexColor);
+		m.putVertex(x2, y1, 0, c.vertexColor);
+		m.putVertex(x2, y1, 0, c.vertexColor);
+		m.putVertex(x1, y2, 0, c.vertexColor);
+		m.putVertex(x2, y2, 0, c.vertexColor);
 		glEnd();
 	}
 

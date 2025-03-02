@@ -25,6 +25,7 @@ import static fr.traditio.gl.opengl.TGL11.gluPerspective;
 import fr.traditio.gl.TraditioGLException;
 import fr.traditio.gl.display.Display;
 import fr.traditio.gl.display.DisplayMode;
+import fr.traditio.gl.opengl.TGL11;
 import fr.traditio.gl.opengl.Texture;
 
 public class HelloTraditioGL {
@@ -159,6 +160,8 @@ public class HelloTraditioGL {
 
 			// Finish draw command and send vertex data to GPU.
 			glEnd();
+			
+			TGL11.printContext();
 
 			// Update display, swap buffers.
 			Display.update();

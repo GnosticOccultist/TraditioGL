@@ -54,7 +54,7 @@ public class TGLContext {
 	boolean applyCullFace = false;
 	int cullFace = TGL11.GL_BACK;
 
-	final Mesh mesh = new Mesh(600);
+	Mesh mesh;
 
 	boolean enableTex2D = false;
 
@@ -68,6 +68,8 @@ public class TGLContext {
 	}
 
 	private void initialize() {
+		mesh = new Mesh(600, capabilities);
+		
 		emptySet.set(DEFINE_NAMES.indexOf("USE_TEXTURE"), false);
 		currentSet = new DefineSet(emptySet);
 
@@ -144,6 +146,8 @@ public class TGLContext {
 		sb.append("\tpolyFill(" + polyFill + ")");
 		sb.append("\n");
 		sb.append("\tenableTex2D(" + enableTex2D + ")");
+		sb.append("\n");
+		sb.append("\tboundTex2D(" + boundTex2D + ")");
 		sb.append("\n");
 		sb.append("\tglMatrixMode(" + matrixMode + ")");
 		sb.append("\n");
