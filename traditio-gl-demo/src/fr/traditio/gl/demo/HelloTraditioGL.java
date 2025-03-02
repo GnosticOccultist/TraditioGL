@@ -160,8 +160,6 @@ public class HelloTraditioGL {
 
 			// Finish draw command and send vertex data to GPU.
 			glEnd();
-			
-			TGL11.printContext();
 
 			// Update display, swap buffers.
 			Display.update();
