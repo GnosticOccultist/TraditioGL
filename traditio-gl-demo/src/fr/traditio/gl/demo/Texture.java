@@ -45,7 +45,8 @@ public final class Texture {
 		buffer.put(data);
 		buffer.flip();
 
-		glTexImage2D(GL_TEXTURE_2D, 0, Display.getPixelFormat().isSRGB() ? GL_SRGB8_ALPHA8 : GL_RGBA8, width, height, 0,
+		glTexImage2D(GL_TEXTURE_2D, 0, Display.getPixelFormat().isSRGB()
+				? GL_SRGB8_ALPHA8 : GL_RGBA8, width, height, 0,
 				GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
 		MemoryUtil.memFree(buffer);

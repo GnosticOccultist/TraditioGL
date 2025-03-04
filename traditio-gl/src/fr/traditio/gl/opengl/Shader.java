@@ -178,15 +178,13 @@ class Shader {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Shader [name=" + name + ", programId=" + programId + ", defines=");
-		sb.append('\n');
 
-		for (int i = 0; i < TGLContext.DEFINE_NAMES.size(); i++) {
+		for (int i = 0; i < TGLContext.DEFINE_NAMES.size(); ++i) {
 			if (!defines.isSet(i)) {
 				continue;
 			}
 
-			sb.append("#define ").append(TGLContext.DEFINE_NAMES.get(i)).append(' ');
-			sb.append('\n');
+			sb.append(TGLContext.DEFINE_NAMES.get(i)).append(' ');
 		}
 		return sb.toString();
 	}

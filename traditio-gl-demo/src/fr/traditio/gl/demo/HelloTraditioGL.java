@@ -21,7 +21,7 @@ public class HelloTraditioGL {
 			Display.setDisplayMode(new DisplayMode(800, 600));
 			Display.setTitle("HelloTraditioGL");
 			Display.setResizable(true);
-			Display.create(PixelFormat.DEFAULT_MSAA.withSRGB(true));
+			Display.create(PixelFormat.DEFAULT_MSAA);
 		} catch (TraditioGLException ex) {
 			ex.printStackTrace();
 		}
@@ -30,9 +30,9 @@ public class HelloTraditioGL {
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_TEXTURE_2D);
-		glEnable(GL_FOG);
 		glEnable(GL_MULTISAMPLE);
 		glEnable(GL_FRAMEBUFFER_SRGB);
+		glEnable(GL_FOG);
 		glFogi(GL_FOG_MODE, GL_EXP2);
 		glFogf(GL_FOG_DENSITY, 0.10f);
 		glFogi(GL_FOG_COORDINATE_SOURCE, GL_FRAGMENT_DEPTH);
@@ -158,6 +158,8 @@ public class HelloTraditioGL {
 
 			// Finish draw command and send vertex data to GPU.
 			glEnd();
+
+			printContext();
 
 			// Update display, swap buffers.
 			Display.update();
