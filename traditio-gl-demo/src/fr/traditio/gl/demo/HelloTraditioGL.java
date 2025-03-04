@@ -11,21 +11,28 @@ import fr.traditio.gl.display.Display;
 import fr.traditio.gl.display.DisplayMode;
 import fr.traditio.gl.display.PixelFormat;
 
-public class HelloTraditioGL {
-
-	private static float rotation;
+public class HelloTraditioGL extends AbstractDemo {
 
 	public static void main(String[] args) {
+
 		try {
 			// Create Display using LWJGL 2 style.
 			Display.setDisplayMode(new DisplayMode(800, 600));
 			Display.setTitle("HelloTraditioGL");
 			Display.setResizable(true);
-			Display.create(PixelFormat.DEFAULT_MSAA);
+
+			var demo = new HelloTraditioGL();
+			demo.start(PixelFormat.DEFAULT_MSAA.withSRGB(true));
 		} catch (TraditioGLException ex) {
 			ex.printStackTrace();
 		}
+	}
 
+	private Texture tex;
+	private double rotation;
+
+	@Override
+	protected void initialize() {
 		// Enable some render state.
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
@@ -50,127 +57,116 @@ public class HelloTraditioGL {
 		glClearColor(0, 0, 0, 0);
 
 		// Load 2D texture and bind it.
-		var tex = new Texture("/textures/wood.jpg");
+		tex = new Texture("/textures/wood.jpg");
 		glBindTexture(GL_TEXTURE_2D, tex.id());
 
 		// Load perspective projection matrix and define viewport dimensions.
-		loadMatrix();
-
-		// Main rendering loop.
-		while (!Display.isCloseRequested()) {
-
-			// Clear color and depth buffer.
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			// If display gets resized, update projection matrix and viewport.
-			if (Display.wasResized()) {
-				loadMatrix();
-			}
-
-			// Load model view matrix, translate and rotate it.
-			glMatrixMode(GL_MODELVIEW);
-			glLoadIdentity();
-			glTranslatef(0, 0, -5);
-			glRotatef((float) Math.toRadians(rotation), 1.0f, 1.0f, 1.0f);
-
-			// Update rotation for next loop.
-			rotation = (rotation + 0.2f) % 360;
-
-			// Draw 3D cube using triangles.
-			glBegin(GL_TRIANGLES);
-			glTexCoord2f(0.0f, 0.0f);
-			glVertex3f(-0.5f, 0.5f, 0.5f);
-			glTexCoord2f(0.0f, 1.0f);
-			glVertex3f(-0.5f, -0.5f, 0.5f);
-			glTexCoord2f(1.0f, 0.0f);
-			glVertex3f(0.5f, 0.5f, 0.5f);
-			glTexCoord2f(1.0f, 0.0f);
-			glVertex3f(0.5f, 0.5f, 0.5f);
-			glTexCoord2f(0.0f, 1.0f);
-			glVertex3f(-0.5f, -0.5f, 0.5f);
-			glTexCoord2f(1.0f, 1.0f);
-			glVertex3f(0.5f, -0.5f, 0.5f);
-
-			glTexCoord2f(0.0f, 0.0f);
-			glVertex3f(-0.5f, 0.5f, -0.5f);
-			glTexCoord2f(0.0f, 1.0f);
-			glVertex3f(-0.5f, 0.5f, 0.5f);
-			glTexCoord2f(1.0f, 1.0f);
-			glVertex3f(0.5f, 0.5f, 0.5f);
-			glTexCoord2f(1.0f, 0.0f);
-			glVertex3f(0.5f, 0.5f, -0.5f);
-			glTexCoord2f(0.0f, 0.0f);
-			glVertex3f(-0.5f, 0.5f, -0.5f);
-			glTexCoord2f(1.0f, 1.0f);
-			glVertex3f(0.5f, 0.5f, 0.5f);
-
-			glTexCoord2f(1.0f, 1.0f);
-			glVertex3f(0.5f, 0.5f, 0.5f);
-			glTexCoord2f(0.0f, 1.0f);
-			glVertex3f(0.5f, -0.5f, 0.5f);
-			glTexCoord2f(0.0f, 0.0f);
-			glVertex3f(0.5f, -0.5f, -0.5f);
-			glTexCoord2f(1.0f, 0.0f);
-			glVertex3f(0.5f, 0.5f, -0.5f);
-			glTexCoord2f(1.0f, 1.0f);
-			glVertex3f(0.5f, 0.5f, 0.5f);
-			glTexCoord2f(0.0f, 0.0f);
-			glVertex3f(0.5f, -0.5f, -0.5f);
-
-			glTexCoord2f(0.0f, 0.0f);
-			glVertex3f(-0.5f, -0.5f, -0.5f);
-			glTexCoord2f(0.0f, 1.0f);
-			glVertex3f(-0.5f, -0.5f, 0.5f);
-			glTexCoord2f(1.0f, 1.0f);
-			glVertex3f(-0.5f, 0.5f, 0.5f);
-			glTexCoord2f(0.0f, 0.0f);
-			glVertex3f(-0.5f, -0.5f, -0.5f);
-			glTexCoord2f(1.0f, 1.0f);
-			glVertex3f(-0.5f, 0.5f, 0.5f);
-			glTexCoord2f(1.0f, 0.0f);
-			glVertex3f(-0.5f, 0.5f, -0.5f);
-
-			glTexCoord2f(1.0f, 1.0f);
-			glVertex3f(0.5f, -0.5f, 0.5f);
-			glTexCoord2f(0.0f, 1.0f);
-			glVertex3f(-0.5f, -0.5f, 0.5f);
-			glTexCoord2f(0.0f, 0.0f);
-			glVertex3f(-0.5f, -0.5f, -0.5f);
-			glTexCoord2f(1.0f, 1.0f);
-			glVertex3f(0.5f, -0.5f, 0.5f);
-			glTexCoord2f(0.0f, 0.0f);
-			glVertex3f(-0.5f, -0.5f, -0.5f);
-			glTexCoord2f(1.0f, 0.0f);
-			glVertex3f(0.5f, -0.5f, -0.5f);
-
-			glTexCoord2f(1.0f, 1.0f);
-			glVertex3f(0.5f, -0.5f, -0.5f);
-			glTexCoord2f(0.0f, 1.0f);
-			glVertex3f(-0.5f, -0.5f, -0.5f);
-			glTexCoord2f(0.0f, 0.0f);
-			glVertex3f(-0.5f, 0.5f, -0.5f);
-			glTexCoord2f(1.0f, 1.0f);
-			glVertex3f(0.5f, -0.5f, -0.5f);
-			glTexCoord2f(0.0f, 0.0f);
-			glVertex3f(-0.5f, 0.5f, -0.5f);
-			glTexCoord2f(1.0f, 0.0f);
-			glVertex3f(0.5f, 0.5f, -0.5f);
-
-			// Finish draw command and send vertex data to GPU.
-			glEnd();
-
-			printContext();
-
-			// Update display, swap buffers.
-			Display.update();
-		}
-
-		// Destroy texture and display.
-		tex.cleanup();
-		Display.destroy();
+		resized();
 	}
 
-	private static void loadMatrix() {
+	@Override
+	protected void render(Timer timer) {
+		// Load model view matrix, translate and rotate it.
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glTranslatef(0, 0, -5);
+		glRotatef((float) Math.toRadians(rotation), 1.0f, 1.0f, 1.0f);
+
+		// Update rotation for next loop.
+		rotation = (rotation + timer.getTimePerFrame() * 100) % 360;
+
+		// Draw 3D cube using triangles.
+		glBegin(GL_TRIANGLES);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3f(-0.5f, 0.5f, 0.5f);
+		glTexCoord2f(0.0f, 1.0f);
+		glVertex3f(-0.5f, -0.5f, 0.5f);
+		glTexCoord2f(1.0f, 0.0f);
+		glVertex3f(0.5f, 0.5f, 0.5f);
+		glTexCoord2f(1.0f, 0.0f);
+		glVertex3f(0.5f, 0.5f, 0.5f);
+		glTexCoord2f(0.0f, 1.0f);
+		glVertex3f(-0.5f, -0.5f, 0.5f);
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex3f(0.5f, -0.5f, 0.5f);
+
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3f(-0.5f, 0.5f, -0.5f);
+		glTexCoord2f(0.0f, 1.0f);
+		glVertex3f(-0.5f, 0.5f, 0.5f);
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex3f(0.5f, 0.5f, 0.5f);
+		glTexCoord2f(1.0f, 0.0f);
+		glVertex3f(0.5f, 0.5f, -0.5f);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3f(-0.5f, 0.5f, -0.5f);
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex3f(0.5f, 0.5f, 0.5f);
+
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex3f(0.5f, 0.5f, 0.5f);
+		glTexCoord2f(0.0f, 1.0f);
+		glVertex3f(0.5f, -0.5f, 0.5f);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3f(0.5f, -0.5f, -0.5f);
+		glTexCoord2f(1.0f, 0.0f);
+		glVertex3f(0.5f, 0.5f, -0.5f);
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex3f(0.5f, 0.5f, 0.5f);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3f(0.5f, -0.5f, -0.5f);
+
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3f(-0.5f, -0.5f, -0.5f);
+		glTexCoord2f(0.0f, 1.0f);
+		glVertex3f(-0.5f, -0.5f, 0.5f);
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex3f(-0.5f, 0.5f, 0.5f);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3f(-0.5f, -0.5f, -0.5f);
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex3f(-0.5f, 0.5f, 0.5f);
+		glTexCoord2f(1.0f, 0.0f);
+		glVertex3f(-0.5f, 0.5f, -0.5f);
+
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex3f(0.5f, -0.5f, 0.5f);
+		glTexCoord2f(0.0f, 1.0f);
+		glVertex3f(-0.5f, -0.5f, 0.5f);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3f(-0.5f, -0.5f, -0.5f);
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex3f(0.5f, -0.5f, 0.5f);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3f(-0.5f, -0.5f, -0.5f);
+		glTexCoord2f(1.0f, 0.0f);
+		glVertex3f(0.5f, -0.5f, -0.5f);
+
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex3f(0.5f, -0.5f, -0.5f);
+		glTexCoord2f(0.0f, 1.0f);
+		glVertex3f(-0.5f, -0.5f, -0.5f);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3f(-0.5f, 0.5f, -0.5f);
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex3f(0.5f, -0.5f, -0.5f);
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3f(-0.5f, 0.5f, -0.5f);
+		glTexCoord2f(1.0f, 0.0f);
+		glVertex3f(0.5f, 0.5f, -0.5f);
+
+		// Finish draw command and send vertex data to GPU.
+		glEnd();
+	}
+
+	@Override
+	protected void cleanup() {
+		// Destroy texture.
+		tex.cleanup();
+	}
+
+	@Override
+	protected void resized() {
 		glViewport(0, 0, Display.getWidth(), Display.getHeight());
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
