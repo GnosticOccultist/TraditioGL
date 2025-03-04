@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL11C;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL45;
 
@@ -135,6 +136,10 @@ public class TGL11 {
 			c.enableFog = false;
 			c.changeDefine("USE_FOG", false);
 		}
+	}
+
+	public static void glHint(int target, int hint) {
+		GL11C.glHint(target, hint);
 	}
 
 	public static void glFogi(int pname, int param) {
@@ -377,7 +382,7 @@ public class TGL11 {
 
 	public static void glClear(int mask) {
 		var c = TGLContext.get();
-		
+
 		// Bind framebuffer before clearing the current buffer.
 		if (c.enableMultisample && c.msFramebuffer != null) {
 			c.msFramebuffer.bind();

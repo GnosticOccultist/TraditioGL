@@ -3,8 +3,8 @@ package fr.traditio.gl.display;
 public final class PixelFormat {
 
 	/**
-	 * The minimal default pixel format 0-alpha bits, 8-depth bits, 0-stencil bits, no
-	 * anti-aliasing.
+	 * The minimal default pixel format 0-alpha bits, 8-depth bits, 0-stencil bits,
+	 * no anti-aliasing.
 	 */
 	public static final PixelFormat MINIMAL = new PixelFormat();
 	/**
@@ -36,8 +36,8 @@ public final class PixelFormat {
 	 */
 	private int stencil;
 	/**
-	 * The number of samples to use in anti-aliasing. 0 means that anti-aliasing is
-	 * disabled.
+	 * The number of samples to use in anti-aliasing. 1 or less means that
+	 * anti-aliasing is disabled.
 	 */
 	private int samples;
 	/**
@@ -89,7 +89,7 @@ public final class PixelFormat {
 	}
 
 	public PixelFormat(int alpha, int depth, int stencil) {
-		this(alpha, depth, stencil, 0);
+		this(alpha, depth, stencil, 1);
 	}
 
 	public PixelFormat(int alpha, int depth, int stencil, int samples) {

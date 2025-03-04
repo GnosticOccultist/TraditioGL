@@ -37,6 +37,9 @@ public class HelloTraditioGL {
 		glFogf(GL_FOG_DENSITY, 0.10f);
 		glFogi(GL_FOG_COORDINATE_SOURCE, GL_FRAGMENT_DEPTH);
 
+		// Modify sample count at runtime.
+		glHint(GL_SAMPLE_COUNT_HINT, GL_SAMPLE_COUNT_32_BIT);
+
 		try (var stack = MemoryStack.stackPush()) {
 			var buffer = stack.floats(0.7f, 0.2f, 0.7f, 1.0f);
 			buffer.rewind();

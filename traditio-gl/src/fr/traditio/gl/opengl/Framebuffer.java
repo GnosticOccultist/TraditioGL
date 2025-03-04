@@ -21,6 +21,7 @@ final class Framebuffer {
 	private boolean dsaSupport;
 
 	protected Framebuffer(GLCapabilities capabilities, int width, int height, int sampleCount) {
+		System.out.println("FBO with sample" + sampleCount);
 		this.sampleCount = sampleCount;
 		this.width = width;
 		this.height = height;

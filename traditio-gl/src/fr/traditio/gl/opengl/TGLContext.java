@@ -74,6 +74,8 @@ public class TGLContext {
 	float fogCoord = 0.0f;
 
 	boolean enableMultisample = false;
+	int sampleCount = TGL13.GL_SAMPLE_COUNT_1_BIT;
+
 	boolean sRGB = false;
 
 	TGLContext(GLCapabilities capabilities) {
@@ -85,6 +87,8 @@ public class TGLContext {
 
 	private void initialize() {
 		mesh = new Mesh(600, capabilities);
+
+		sampleCount = Display.getPixelFormat().getSamples();
 
 		emptySet.set(DEFINE_NAMES.indexOf("USE_TEXTURE"), false);
 		emptySet.set(DEFINE_NAMES.indexOf("USE_FOG"), false);
@@ -118,7 +122,7 @@ public class TGLContext {
 	}
 
 	boolean changeSampleCount(int sampleCount) {
-		var oldSampleCount = msFramebuffer == null ? 1 : msFramebuffer.getSampleCount();
+		var oldSampleCount = msFramebuffer == null ? TGL13.GL_SAMPLE_COUNT_1_BIT : msFramebuffer.getSampleCount();
 		var changed = sampleCount != oldSampleCount;
 		if (!changed) {
 			return false;
@@ -128,7 +132,7 @@ public class TGLContext {
 			msFramebuffer.cleanup();
 		}
 
-		if (sampleCount <= 1) {
+		if (sampleCount <= TGL13.GL_SAMPLE_COUNT_1_BIT) {
 			msFramebuffer = null;
 		} else {
 			msFramebuffer = new Framebuffer(capabilities, Display.getWidth(), Display.getHeight(), sampleCount);
