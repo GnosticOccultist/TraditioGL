@@ -181,6 +181,14 @@ public class TGLContext {
 		mesh.destroy();
 	}
 
+	public void resized() {
+		// Resize framebuffer.
+		if (enableMultisample && msFramebuffer != null) {
+			msFramebuffer.cleanup();
+			msFramebuffer = new Framebuffer(capabilities, Display.getWidth(), Display.getHeight(), sampleCount);
+		}
+	}
+
 	public void postRender() {
 		// Bind framebuffer before clearing the current buffer.
 		if (enableMultisample && msFramebuffer != null) {

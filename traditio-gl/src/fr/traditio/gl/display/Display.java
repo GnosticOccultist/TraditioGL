@@ -210,6 +210,10 @@ public class Display {
 		var c = TGLContext.get();
 		c.postRender();
 
+		if (resized) {
+			c.resized();
+		}
+		
 		// TODO: We paint only when the window is visible or dirty
 		try {
 			swapBuffers();
