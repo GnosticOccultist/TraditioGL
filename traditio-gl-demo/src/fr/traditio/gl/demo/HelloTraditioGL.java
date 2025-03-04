@@ -2,12 +2,14 @@ package fr.traditio.gl.demo;
 
 import static fr.traditio.gl.opengl.TGL11.*;
 import static fr.traditio.gl.opengl.TGL14.*;
+import static fr.traditio.gl.opengl.TGL30.*;
 
 import org.lwjgl.system.MemoryStack;
 
 import fr.traditio.gl.TraditioGLException;
 import fr.traditio.gl.display.Display;
 import fr.traditio.gl.display.DisplayMode;
+import fr.traditio.gl.display.PixelFormat;
 
 public class HelloTraditioGL {
 
@@ -19,9 +21,9 @@ public class HelloTraditioGL {
 			Display.setDisplayMode(new DisplayMode(800, 600));
 			Display.setTitle("HelloTraditioGL");
 			Display.setResizable(true);
-			Display.create();
-		} catch (TraditioGLException e) {
-			e.printStackTrace();
+			Display.create(PixelFormat.DEFAULT_MSAA.withSRGB(true));
+		} catch (TraditioGLException ex) {
+			ex.printStackTrace();
 		}
 
 		// Enable some render state.
@@ -29,9 +31,11 @@ public class HelloTraditioGL {
 		glEnable(GL_CULL_FACE);
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_FOG);
+		glEnable(GL_MULTISAMPLE);
+		glEnable(GL_FRAMEBUFFER_SRGB);
 		glFogi(GL_FOG_MODE, GL_EXP2);
-		glFogf(GL_FOG_DENSITY, 0.25f);
-		glFogi(GL_FOG_COORDINATE_SOURCE, GL_FOG_COORDINATE);
+		glFogf(GL_FOG_DENSITY, 0.10f);
+		glFogi(GL_FOG_COORDINATE_SOURCE, GL_FRAGMENT_DEPTH);
 
 		try (var stack = MemoryStack.stackPush()) {
 			var buffer = stack.floats(0.7f, 0.2f, 0.7f, 1.0f);

@@ -376,7 +376,13 @@ public class TGL11 {
 	}
 
 	public static void glClear(int mask) {
-		TGLContext.checkContext();
+		var c = TGLContext.get();
+		
+		// Bind framebuffer before clearing the current buffer.
+		if (c.enableMultisample && c.msFramebuffer != null) {
+			c.msFramebuffer.bind();
+		}
+
 		GL11.glClear(mask);
 	}
 

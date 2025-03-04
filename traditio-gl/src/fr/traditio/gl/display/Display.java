@@ -71,6 +71,10 @@ public class Display {
 	 */
 	private static DisplayMode currentMode;
 	/**
+	 * The current pixel format.
+	 */
+	private static PixelFormat currentPixelFormat;
+	/**
 	 * The OpenGL context capabilities.
 	 */
 	private static GLCapabilities capabilities;
@@ -108,9 +112,15 @@ public class Display {
 	}
 
 	public static void create() throws TraditioGLException {
+		create(new PixelFormat());
+	}
+
+	public static void create(PixelFormat pixelFormat) throws TraditioGLException {
 		if (isCreated()) {
 			throw new IllegalStateException("Only one LWJGL context may be instantiated at any one time.");
 		}
+
+		currentPixelFormat = pixelFormat;
 
 		createWindow();
 
@@ -122,12 +132,22 @@ public class Display {
 			return;
 		}
 
-		GLFW.glfwDefaultWindowHints();
 		GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
 		GLFW.glfwWindowHint(GLFW.GLFW_CLIENT_API, GLFW.GLFW_OPENGL_API);
 		GLFW.glfwWindowHint(GLFW.GLFW_RESIZABLE, resizable ? GLFW.GLFW_TRUE : GLFW.GLFW_FALSE);
 		GLFW.glfwWindowHint(GLFW.GLFW_POSITION_X, getWindowX());
 		GLFW.glfwWindowHint(GLFW.GLFW_POSITION_Y, getWindowY());
+
+		// PixelFormat hints.
+		GLFW.glfwWindowHint(GLFW.GLFW_ALPHA_BITS, currentPixelFormat.getAlphaBits());
+		GLFW.glfwWindowHint(GLFW.GLFW_DEPTH_BITS, currentPixelFormat.getDepthBits());
+		GLFW.glfwWindowHint(GLFW.GLFW_STENCIL_BITS, currentPixelFormat.getStencilBits());
+		GLFW.glfwWindowHint(GLFW.GLFW_ACCUM_ALPHA_BITS, currentPixelFormat.getAccumulationAlpha());
+		GLFW.glfwWindowHint(GLFW.GLFW_AUX_BUFFERS, currentPixelFormat.getAuxBuffers());
+		// Multisampling is managed using FBO to be able to be modified at runtime
+		// without having to recreate GLFW and OpenGL context.
+		// GLFW.glfwWindowHint(GLFW.GLFW_SAMPLES, currentPixelFormat.getSamples());
+		GLFW.glfwWindowHint(GLFW.GLFW_SRGB_CAPABLE, currentPixelFormat.isSRGB() ? GLFW.GLFW_TRUE : GLFW.GLFW_FALSE);
 
 		glfwWindowHandle = GLFW.glfwCreateWindow(getEffectiveMode().getWidth(), getEffectiveMode().getHeight(), title,
 				MemoryUtil.NULL, MemoryUtil.NULL);
@@ -182,8 +202,13 @@ public class Display {
 	 * @param processMessages Poll input devices if true
 	 */
 	public static void update(boolean processMessages) {
-		if (!isCreated())
+		if (!isCreated()) {
 			throw new IllegalStateException("Display not created!");
+		}
+
+		// Apply post-processing once rendering is finished.
+		var c = TGLContext.get();
+		c.postRender();
 
 		// TODO: We paint only when the window is visible or dirty
 		try {
@@ -274,6 +299,10 @@ public class Display {
 
 	private static DisplayMode getEffectiveMode() {
 		return currentMode;
+	}
+
+	public static PixelFormat getPixelFormat() {
+		return currentPixelFormat;
 	}
 
 	public static DisplayMode[] getAvailableDisplayModes() throws TraditioGLException {

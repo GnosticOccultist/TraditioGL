@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.lwjgl.opengl.GLCapabilities;
 
+import fr.traditio.gl.display.Display;
 import fr.traditio.gl.math.Color4f;
 import fr.traditio.gl.math.MatrixStack;
 import fr.traditio.gl.math.Vector3f;
@@ -45,6 +46,8 @@ public class TGLContext {
 
 	Shader currentShader = null;
 
+	Framebuffer msFramebuffer = null;
+
 	final Map<DefineSet, Shader> shaders = new HashMap<>();
 
 	boolean depthTest = false;
@@ -69,6 +72,9 @@ public class TGLContext {
 	float fogEnd = 1.0f;
 	boolean useFogCoord = false;
 	float fogCoord = 0.0f;
+
+	boolean enableMultisample = false;
+	boolean sRGB = false;
 
 	TGLContext(GLCapabilities capabilities) {
 		this.capabilities = capabilities;
@@ -111,6 +117,26 @@ public class TGLContext {
 		return false;
 	}
 
+	boolean changeSampleCount(int sampleCount) {
+		var oldSampleCount = msFramebuffer == null ? 1 : msFramebuffer.getSampleCount();
+		var changed = sampleCount != oldSampleCount;
+		if (!changed) {
+			return false;
+		}
+
+		if (msFramebuffer != null) {
+			msFramebuffer.cleanup();
+		}
+
+		if (sampleCount <= 1) {
+			msFramebuffer = null;
+		} else {
+			msFramebuffer = new Framebuffer(capabilities, Display.getWidth(), Display.getHeight(), sampleCount);
+		}
+
+		return true;
+	}
+
 	void prepareShader() {
 		currentShader.uniformMat4("projection", getOrCreateMatrixStack(TGL11.GL_PROJECTION).peek());
 		currentShader.uniformMat4("modelView", getOrCreateMatrixStack(TGL11.GL_MODELVIEW).peek());
@@ -149,6 +175,13 @@ public class TGLContext {
 		}
 
 		mesh.destroy();
+	}
+
+	public void postRender() {
+		// Bind framebuffer before clearing the current buffer.
+		if (enableMultisample && msFramebuffer != null) {
+			msFramebuffer.blit();
+		}
 	}
 
 	@Override

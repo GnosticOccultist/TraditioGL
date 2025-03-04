@@ -4,10 +4,11 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryUtil;
 
-import static fr.traditio.gl.opengl.TGL11.*;
+import fr.traditio.gl.display.Display;
+
+import static fr.traditio.gl.opengl.TGL21.*;
 
 public final class Texture {
 
@@ -44,8 +45,9 @@ public final class Texture {
 		buffer.put(data);
 		buffer.flip();
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
-		
+		glTexImage2D(GL_TEXTURE_2D, 0, Display.getPixelFormat().isSRGB() ? GL_SRGB8_ALPHA8 : GL_RGBA8, width, height, 0,
+				GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+
 		MemoryUtil.memFree(buffer);
 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

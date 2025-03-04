@@ -144,8 +144,6 @@ class Shader {
 			sb.append(result);
 		}
 
-		System.out.println(sb.toString());
-
 		return sb.toString();
 	}
 

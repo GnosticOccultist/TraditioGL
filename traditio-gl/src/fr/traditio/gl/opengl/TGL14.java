@@ -1,10 +1,14 @@
 package fr.traditio.gl.opengl;
 
-public class TGL14 extends TGL11 {
+public class TGL14 extends TGL13 {
 
 	public static final int GL_FOG_COORDINATE_SOURCE = 0x8450;
 	public static final int GL_FOG_COORDINATE = 0x8451;
 	public static final int GL_FRAGMENT_DEPTH = 0x8452;
+	
+	protected TGL14() {
+		throw new UnsupportedOperationException();
+	}
 
 	public static void glFogi(int pname, int param) {
 		var c = TGLContext.get();
