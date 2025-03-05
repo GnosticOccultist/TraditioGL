@@ -128,12 +128,12 @@ class Shader {
 		sb.append("#version 330 core");
 		sb.append('\n');
 
-		for (int i = 0; i < TGLContext.DEFINE_NAMES.size(); i++) {
+		for (int i = 0; i < MaterialTechnique.DEFINE_NAMES.size(); i++) {
 			if (!defines.isSet(i)) {
 				continue;
 			}
 
-			sb.append("#define ").append(TGLContext.DEFINE_NAMES.get(i)).append(' ');
+			sb.append("#define ").append(MaterialTechnique.DEFINE_NAMES.get(i)).append(' ');
 			sb.append('\n');
 		}
 
@@ -179,12 +179,12 @@ class Shader {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Shader [name=" + name + ", programId=" + programId + ", defines=");
 
-		for (int i = 0; i < TGLContext.DEFINE_NAMES.size(); ++i) {
+		for (int i = 0; i < MaterialTechnique.DEFINE_NAMES.size(); ++i) {
 			if (!defines.isSet(i)) {
 				continue;
 			}
 
-			sb.append(TGLContext.DEFINE_NAMES.get(i)).append(' ');
+			sb.append(MaterialTechnique.DEFINE_NAMES.get(i)).append(' ');
 		}
 		return sb.toString();
 	}

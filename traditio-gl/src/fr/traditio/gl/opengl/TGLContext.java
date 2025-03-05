@@ -1,8 +1,6 @@
 package fr.traditio.gl.opengl;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.lwjgl.opengl.GLCapabilities;
@@ -15,9 +13,6 @@ import fr.traditio.gl.math.Vector3f;
 public class TGLContext {
 
 	private static final ThreadLocal<TGLContext> CONTEXT_LOCAL = new ThreadLocal<>();
-
-	public static final List<String> DEFINE_NAMES = Arrays.asList("USE_TEXTURE", "USE_FOG", "FOG_LINEAR", "FOG_EXP",
-			"FOG_EXP2", "USE_FOG_COORD");
 
 	/**
 	 * The OpenGL context capabilities.
@@ -40,15 +35,11 @@ public class TGLContext {
 
 	final Vector3f vertexNorm = new Vector3f(0.0f, 0.0f, 0.0f);
 
-	final DefineSet emptySet = new DefineSet(DEFINE_NAMES.size());
+	final Map<String, MaterialTechnique> techniques = new HashMap<>();
 
-	DefineSet currentSet;
-
-	Shader currentShader = null;
+	MaterialTechnique currentTechnique;
 
 	Framebuffer msFramebuffer = null;
-
-	final Map<DefineSet, Shader> shaders = new HashMap<>();
 
 	boolean depthTest = false;
 
@@ -78,6 +69,9 @@ public class TGLContext {
 
 	boolean sRGB = false;
 
+	boolean enableLighting = false;
+	final Light[] lights = new Light[8];
+
 	TGLContext(GLCapabilities capabilities) {
 		this.capabilities = capabilities;
 		CONTEXT_LOCAL.set(this);
@@ -88,37 +82,31 @@ public class TGLContext {
 	private void initialize() {
 		mesh = new Mesh(600, capabilities);
 
+		lights[0].diffuse.set(1.0f, 1.0f, 1.0f, 1.0f);
+		lights[0].specular.set(1.0f, 1.0f, 1.0f, 1.0f);
+
 		sampleCount = Display.getPixelFormat().getSamples();
-
-		emptySet.set(DEFINE_NAMES.indexOf("USE_TEXTURE"), false);
-		emptySet.set(DEFINE_NAMES.indexOf("USE_FOG"), false);
-		emptySet.set(DEFINE_NAMES.indexOf("FOG_LINEAR"), false);
-		emptySet.set(DEFINE_NAMES.indexOf("FOG_EXP"), true);
-		emptySet.set(DEFINE_NAMES.indexOf("FOG_EXP2"), false);
-		emptySet.set(DEFINE_NAMES.indexOf("USE_FOG_COORD"), false);
-		currentSet = new DefineSet(emptySet);
-
-		currentShader = new Shader("base", emptySet);
-		shaders.put(emptySet, currentShader);
-
-		prepareShader();
+		changeTechnique("base");
 	}
 
-	boolean changeDefine(String define, boolean value) {
-		var changed = currentSet.set(DEFINE_NAMES.indexOf(define), value);
-		if (changed) {
-			var shader = shaders.get(currentSet);
-			if (shader == null) {
-				var defines = new DefineSet(currentSet);
-				shader = new Shader("base", defines);
-				shaders.put(defines, shader);
-			}
-
-			currentShader = shader;
-			return true;
+	void changeTechnique(String name) {
+		if (currentTechnique != null && currentTechnique.name.equals(name)) {
+			return;
 		}
 
-		return false;
+		var technique = techniques.get(name);
+		if (technique == null) {
+			technique = new MaterialTechnique(name);
+			techniques.put(name, technique);
+		}
+
+		if (currentTechnique != null) {
+			var defines = currentTechnique.currentSet;
+			technique.changeDefine(defines);
+		}
+
+		technique.prepareShader(this);
+		currentTechnique = technique;
 	}
 
 	boolean changeSampleCount(int sampleCount) {
@@ -141,24 +129,6 @@ public class TGLContext {
 		return true;
 	}
 
-	void prepareShader() {
-		currentShader.uniformMat4("projection", getOrCreateMatrixStack(TGL11.GL_PROJECTION).peek());
-		currentShader.uniformMat4("modelView", getOrCreateMatrixStack(TGL11.GL_MODELVIEW).peek());
-
-		if (boundTex2D != 0 && enableTex2D) {
-			currentShader.uniformi("texture_sampler", 0);
-		}
-
-		if (enableFog) {
-			currentShader.uniform4f("fogColor", fogColor.r(), fogColor.g(), fogColor.b(), fogColor.a());
-			if (fogMode == TGL11.GL_LINEAR) {
-				currentShader.uniform2f("fogLinearRange", fogStart, fogEnd);
-			} else if (fogMode == TGL11.GL_EXP || fogMode == TGL11.GL_EXP2) {
-				currentShader.uniformf("fogDensity", fogDensity);
-			}
-		}
-	}
-
 	MatrixStack getOrCreateMatrixStack() {
 		return getOrCreateMatrixStack(matrixMode);
 	}
@@ -174,10 +144,7 @@ public class TGLContext {
 	}
 
 	private void cleanup() {
-		for (var shader : shaders.values()) {
-			shader.cleanup();
-		}
-
+		currentTechnique.cleanup();
 		mesh.destroy();
 	}
 
@@ -236,7 +203,7 @@ public class TGLContext {
 		sb.append("\n");
 		sb.append("\tmatrixStacks(" + matrixStacks + ")");
 		sb.append("\n");
-		sb.append("\tcurrentShader(" + currentShader + ")");
+		sb.append("\tcurrentTechnique(" + currentTechnique + ")");
 		sb.append("\n");
 		sb.append("\tmsFramebuffer(" + msFramebuffer + ")");
 		sb.append("\n");

@@ -61,4 +61,8 @@ final class DefineSet {
 		return Objects.equals(defined, other.defined);
 	}
 
+	@Override
+	public String toString() {
+		return "DefineSet [defined=" + defined + "]";
+	}
 }

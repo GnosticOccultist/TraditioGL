@@ -20,6 +20,7 @@ public class TGL11 {
 	public static final int GL_DEPTH_TEST = 0xB71;
 	public static final int GL_CULL_FACE = 0xB44;
 	public static final int GL_TEXTURE_2D = 0xDE1;
+	public static final int GL_LIGHTING = 0xB50;
 
 	public static final int GL_POINTS = 0x0;
 	public static final int GL_LINES = 0x1;
@@ -92,6 +93,31 @@ public class TGL11 {
 
 	public static final int GL_RGBA8 = 0x8058;
 
+	public static final int GL_LIGHT0 = 0x4000;
+	public static final int GL_LIGHT1 = 0x4001;
+	public static final int GL_LIGHT2 = 0x4002;
+	public static final int GL_LIGHT3 = 0x4003;
+	public static final int GL_LIGHT4 = 0x4004;
+	public static final int GL_LIGHT5 = 0x4005;
+	public static final int GL_LIGHT6 = 0x4006;
+	public static final int GL_LIGHT7 = 0x4007;
+
+	public static final int GL_AMBIENT = 0x1200;
+	public static final int GL_DIFFUSE = 0x1201;
+	public static final int GL_SPECULAR = 0x1202;
+	public static final int GL_POSITION = 0x1203;
+	public static final int GL_SPOT_DIRECTION = 0x1204;
+	public static final int GL_SPOT_EXPONENT = 0x1205;
+	public static final int GL_SPOT_CUTOFF = 0x1206;
+	public static final int GL_CONSTANT_ATTENUATION = 0x1207;
+	public static final int GL_LINEAR_ATTENUATION = 0x1208;
+	public static final int GL_QUADRATIC_ATTENUATION = 0x1209;
+
+	public static final int GL_EMISSION = 0x1600;
+	public static final int GL_SHININESS = 0x1601;
+	public static final int GL_AMBIENT_AND_DIFFUSE = 0x1602;
+	public static final int GL_COLOR_INDEXES = 0x1603;
+
 	protected TGL11() {
 		throw new UnsupportedOperationException();
 	}
@@ -109,11 +135,19 @@ public class TGL11 {
 		} else if (target == GL_TEXTURE_2D && !c.enableTex2D) {
 			c.mesh.flush();
 			c.enableTex2D = true;
-			c.changeDefine("USE_TEXTURE", true);
+			c.currentTechnique.changeDefine("USE_TEXTURE", true);
 		} else if (target == GL_FOG && !c.enableFog) {
 			c.mesh.flush();
 			c.enableFog = true;
-			c.changeDefine("USE_FOG", true);
+			c.currentTechnique.changeDefine("USE_FOG", true);
+		} else if (target == GL_LIGHTING && !c.enableLighting) {
+			c.mesh.flush();
+			c.enableLighting = true;
+			c.changeTechnique("lit");
+		} else if (target >= GL_LIGHT0 && target <= GL_LIGHT7) {
+			c.mesh.flush();
+			var lightIdx = target - GL_LIGHT0;
+			c.lights[lightIdx].enabled = true;
 		}
 	}
 
@@ -130,16 +164,118 @@ public class TGL11 {
 		} else if (target == GL_TEXTURE_2D && c.enableTex2D) {
 			c.mesh.flush();
 			c.enableTex2D = false;
-			c.changeDefine("USE_TEXTURE", false);
+			c.currentTechnique.changeDefine("USE_TEXTURE", false);
 		} else if (target == GL_FOG && c.enableFog) {
 			c.mesh.flush();
 			c.enableFog = false;
-			c.changeDefine("USE_FOG", false);
+			c.currentTechnique.changeDefine("USE_FOG", false);
+		} else if (target == GL_LIGHTING && c.enableLighting) {
+			c.mesh.flush();
+			c.enableLighting = false;
+			c.changeTechnique("base");
+		} else if (target >= GL_LIGHT0 && target <= GL_LIGHT7) {
+			c.mesh.flush();
+			var lightIdx = target - GL_LIGHT0;
+			c.lights[lightIdx].enabled = false;
 		}
 	}
 
 	public static void glHint(int target, int hint) {
 		GL11C.glHint(target, hint);
+	}
+
+	public static void glLighti(int light, int pname, int param) {
+		var c = TGLContext.get();
+		var lightIdx = light - GL_LIGHT0;
+		switch (pname) {
+		case GL_SPOT_EXPONENT:
+			c.lights[lightIdx].spotExponent = param;
+			break;
+		case GL_SPOT_CUTOFF:
+			c.lights[lightIdx].spotCutoff = param;
+			break;
+		case GL_CONSTANT_ATTENUATION:
+			c.lights[lightIdx].attenuation.set(param, c.lights[lightIdx].attenuation.y(),
+					c.lights[lightIdx].attenuation.z());
+			break;
+		case GL_LINEAR_ATTENUATION:
+			c.lights[lightIdx].attenuation.set(c.lights[lightIdx].attenuation.x(), param,
+					c.lights[lightIdx].attenuation.z());
+			break;
+		case GL_QUADRATIC_ATTENUATION:
+			c.lights[lightIdx].attenuation.set(c.lights[lightIdx].attenuation.x(), c.lights[lightIdx].attenuation.y(),
+					param);
+			break;
+		}
+	}
+
+	public static void glLightf(int light, int pname, float param) {
+		var c = TGLContext.get();
+		var lightIdx = light - GL_LIGHT0;
+		switch (pname) {
+		case GL_SPOT_EXPONENT:
+			c.lights[lightIdx].spotExponent = param;
+			break;
+		case GL_SPOT_CUTOFF:
+			c.lights[lightIdx].spotCutoff = param;
+			break;
+		case GL_CONSTANT_ATTENUATION:
+			c.lights[lightIdx].attenuation.set(param, c.lights[lightIdx].attenuation.y(),
+					c.lights[lightIdx].attenuation.z());
+			break;
+		case GL_LINEAR_ATTENUATION:
+			c.lights[lightIdx].attenuation.set(c.lights[lightIdx].attenuation.x(), param,
+					c.lights[lightIdx].attenuation.z());
+			break;
+		case GL_QUADRATIC_ATTENUATION:
+			c.lights[lightIdx].attenuation.set(c.lights[lightIdx].attenuation.x(), c.lights[lightIdx].attenuation.y(),
+					param);
+			break;
+		}
+	}
+
+	public static void glLightfv(int light, int pname, float[] params) {
+		var c = TGLContext.get();
+		var lightIdx = light - GL_LIGHT0;
+		switch (pname) {
+		case GL_AMBIENT:
+			c.lights[lightIdx].ambient.set(params[0], params[1], params[2], params[3]);
+			break;
+		case GL_DIFFUSE:
+			c.lights[lightIdx].diffuse.set(params[0], params[1], params[2], params[3]);
+			break;
+		case GL_SPECULAR:
+			c.lights[lightIdx].specular.set(params[0], params[1], params[2], params[3]);
+			break;
+		case GL_POSITION:
+			c.lights[lightIdx].position.set(params[0], params[1], params[2], params[3]);
+			break;
+		case GL_SPOT_DIRECTION:
+			c.lights[lightIdx].direction.set(params[0], params[1], params[2]);
+			break;
+		}
+	}
+
+	public static void glLightfv(int light, int pname, FloatBuffer params) {
+		var c = TGLContext.get();
+		var lightIdx = light - GL_LIGHT0;
+		switch (pname) {
+		case GL_AMBIENT:
+			c.lights[lightIdx].ambient.set(params);
+			break;
+		case GL_DIFFUSE:
+			c.lights[lightIdx].diffuse.set(params);
+			break;
+		case GL_SPECULAR:
+			c.lights[lightIdx].specular.set(params);
+			break;
+		case GL_POSITION:
+			c.lights[lightIdx].position.set(params);
+			break;
+		case GL_SPOT_DIRECTION:
+			c.lights[lightIdx].direction.set(params);
+			break;
+		}
 	}
 
 	public static void glFogi(int pname, int param) {
@@ -152,17 +288,17 @@ public class TGL11 {
 			if (changed) {
 				// TODO: Improve this mess.
 				if (c.fogMode == GL_LINEAR) {
-					c.changeDefine("FOG_LINEAR", true);
-					c.changeDefine("FOG_EXP", false);
-					c.changeDefine("FOG_EXP2", false);
+					c.currentTechnique.changeDefine("FOG_LINEAR", true);
+					c.currentTechnique.changeDefine("FOG_EXP", false);
+					c.currentTechnique.changeDefine("FOG_EXP2", false);
 				} else if (c.fogMode == GL_EXP) {
-					c.changeDefine("FOG_LINEAR", false);
-					c.changeDefine("FOG_EXP", true);
-					c.changeDefine("FOG_EXP2", false);
+					c.currentTechnique.changeDefine("FOG_LINEAR", false);
+					c.currentTechnique.changeDefine("FOG_EXP", true);
+					c.currentTechnique.changeDefine("FOG_EXP2", false);
 				} else if (c.fogMode == GL_EXP2) {
-					c.changeDefine("FOG_LINEAR", false);
-					c.changeDefine("FOG_EXP", false);
-					c.changeDefine("FOG_EXP2", true);
+					c.currentTechnique.changeDefine("FOG_LINEAR", false);
+					c.currentTechnique.changeDefine("FOG_EXP", false);
+					c.currentTechnique.changeDefine("FOG_EXP2", true);
 				}
 			}
 			break;
@@ -191,17 +327,17 @@ public class TGL11 {
 			if (changed) {
 				// TODO: Improve this mess.
 				if (c.fogMode == GL_LINEAR) {
-					c.changeDefine("FOG_LINEAR", true);
-					c.changeDefine("FOG_EXP", false);
-					c.changeDefine("FOG_EXP2", false);
+					c.currentTechnique.changeDefine("FOG_LINEAR", true);
+					c.currentTechnique.changeDefine("FOG_EXP", false);
+					c.currentTechnique.changeDefine("FOG_EXP2", false);
 				} else if (c.fogMode == GL_EXP) {
-					c.changeDefine("FOG_LINEAR", false);
-					c.changeDefine("FOG_EXP", true);
-					c.changeDefine("FOG_EXP2", false);
+					c.currentTechnique.changeDefine("FOG_LINEAR", false);
+					c.currentTechnique.changeDefine("FOG_EXP", true);
+					c.currentTechnique.changeDefine("FOG_EXP2", false);
 				} else if (c.fogMode == GL_EXP2) {
-					c.changeDefine("FOG_LINEAR", false);
-					c.changeDefine("FOG_EXP", false);
-					c.changeDefine("FOG_EXP2", true);
+					c.currentTechnique.changeDefine("FOG_LINEAR", false);
+					c.currentTechnique.changeDefine("FOG_EXP", false);
+					c.currentTechnique.changeDefine("FOG_EXP2", true);
 				}
 			}
 			break;
@@ -418,12 +554,12 @@ public class TGL11 {
 
 		if (c.boundTex2D == 0) {
 			// No bound texture in context, so ignore the define in shader.
-			c.changeDefine("USE_TEXTURE", false);
+			c.currentTechnique.changeDefine("USE_TEXTURE", false);
 		} else if (c.boundTex2D != 0 && c.enableTex2D) {
-			c.changeDefine("USE_TEXTURE", true);
+			c.currentTechnique.changeDefine("USE_TEXTURE", true);
 		}
 
-		c.prepareShader();
+		c.currentTechnique.prepareShader(c);
 		c.mesh.start();
 		c.mesh.setMode(PrimitiveMode.fromGL(mode));
 	}

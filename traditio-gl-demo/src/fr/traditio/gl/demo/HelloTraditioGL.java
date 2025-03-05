@@ -43,6 +43,9 @@ public class HelloTraditioGL extends AbstractDemo {
 		glFogi(GL_FOG_MODE, GL_EXP2);
 		glFogf(GL_FOG_DENSITY, 0.10f);
 		glFogi(GL_FOG_COORDINATE_SOURCE, GL_FRAGMENT_DEPTH);
+		
+		glEnable(GL_LIGHTING);
+		glEnable(GL_LIGHT0);
 
 		// Modify sample count at runtime.
 		glHint(GL_SAMPLE_COUNT_HINT, GL_SAMPLE_COUNT_32_BIT);
@@ -51,6 +54,10 @@ public class HelloTraditioGL extends AbstractDemo {
 			var buffer = stack.floats(0.7f, 0.2f, 0.7f, 1.0f);
 			buffer.rewind();
 			glFogfv(GL_FOG_COLOR, buffer);
+			
+			buffer = stack.floats(0.0f, 0.0f, 0.0f, 0.0f);
+			buffer.rewind();
+			glLightfv(GL_LIGHT0, GL_POSITION, buffer);
 		}
 
 		// Define clear color to black no alpha (default).

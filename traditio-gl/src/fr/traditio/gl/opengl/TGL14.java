@@ -5,7 +5,7 @@ public class TGL14 extends TGL13 {
 	public static final int GL_FOG_COORDINATE_SOURCE = 0x8450;
 	public static final int GL_FOG_COORDINATE = 0x8451;
 	public static final int GL_FRAGMENT_DEPTH = 0x8452;
-	
+
 	protected TGL14() {
 		throw new UnsupportedOperationException();
 	}
@@ -19,7 +19,7 @@ public class TGL14 extends TGL13 {
 			changed = (c.useFogCoord && param != GL_FOG_COORDINATE) || (!c.useFogCoord && param == GL_FOG_COORDINATE);
 			c.useFogCoord = param == GL_FOG_COORDINATE;
 			if (changed) {
-				c.changeDefine("USE_FOG_COORD", c.useFogCoord);
+				c.currentTechnique.changeDefine("USE_FOG_COORD", c.useFogCoord);
 			}
 			break;
 		}
@@ -34,7 +34,7 @@ public class TGL14 extends TGL13 {
 			changed = c.useFogCoord && param != GL_FOG_COORDINATE;
 			c.useFogCoord = param == GL_FOG_COORDINATE;
 			if (changed) {
-				c.changeDefine("USE_FOG_COORD", c.useFogCoord);
+				c.currentTechnique.changeDefine("USE_FOG_COORD", c.useFogCoord);
 			}
 			break;
 		}
