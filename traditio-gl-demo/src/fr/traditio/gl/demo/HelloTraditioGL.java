@@ -3,7 +3,6 @@ package fr.traditio.gl.demo;
 import static fr.traditio.gl.opengl.TGL11.*;
 import static fr.traditio.gl.opengl.TGL14.*;
 import static fr.traditio.gl.opengl.TGL30.*;
-
 import org.lwjgl.system.MemoryStack;
 
 import fr.traditio.gl.TraditioGLException;
@@ -39,11 +38,11 @@ public class HelloTraditioGL extends AbstractDemo {
 		glEnable(GL_TEXTURE_2D);
 		glEnable(GL_MULTISAMPLE);
 		glEnable(GL_FRAMEBUFFER_SRGB);
-		glEnable(GL_FOG);
+		//glEnable(GL_FOG);
 		glFogi(GL_FOG_MODE, GL_EXP2);
 		glFogf(GL_FOG_DENSITY, 0.10f);
 		glFogi(GL_FOG_COORDINATE_SOURCE, GL_FRAGMENT_DEPTH);
-		
+
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
 
@@ -54,10 +53,10 @@ public class HelloTraditioGL extends AbstractDemo {
 			var buffer = stack.floats(0.7f, 0.2f, 0.7f, 1.0f);
 			buffer.rewind();
 			glFogfv(GL_FOG_COLOR, buffer);
-			
-			buffer = stack.floats(0.0f, 0.0f, 0.0f, 0.0f);
+
+			buffer = stack.floats(0.025f, 0.01f, 0.01f, 1.0f);
 			buffer.rewind();
-			glLightfv(GL_LIGHT0, GL_POSITION, buffer);
+			glLightfv(GL_LIGHT0, GL_AMBIENT, buffer);
 		}
 
 		// Define clear color to black no alpha (default).
@@ -84,6 +83,7 @@ public class HelloTraditioGL extends AbstractDemo {
 
 		// Draw 3D cube using triangles.
 		glBegin(GL_TRIANGLES);
+		glNormal3f(0, 0, 1.0f);
 		glTexCoord2f(0.0f, 0.0f);
 		glVertex3f(-0.5f, 0.5f, 0.5f);
 		glTexCoord2f(0.0f, 1.0f);
@@ -97,6 +97,7 @@ public class HelloTraditioGL extends AbstractDemo {
 		glTexCoord2f(1.0f, 1.0f);
 		glVertex3f(0.5f, -0.5f, 0.5f);
 
+		glNormal3f(0, 1.0f, 0.0f);
 		glTexCoord2f(0.0f, 0.0f);
 		glVertex3f(-0.5f, 0.5f, -0.5f);
 		glTexCoord2f(0.0f, 1.0f);
@@ -110,6 +111,7 @@ public class HelloTraditioGL extends AbstractDemo {
 		glTexCoord2f(1.0f, 1.0f);
 		glVertex3f(0.5f, 0.5f, 0.5f);
 
+		glNormal3f(1.0f, 0.0f, 0.0f);
 		glTexCoord2f(1.0f, 1.0f);
 		glVertex3f(0.5f, 0.5f, 0.5f);
 		glTexCoord2f(0.0f, 1.0f);
@@ -123,6 +125,7 @@ public class HelloTraditioGL extends AbstractDemo {
 		glTexCoord2f(0.0f, 0.0f);
 		glVertex3f(0.5f, -0.5f, -0.5f);
 
+		glNormal3f(-1.0f, 0.0f, 0.0f);
 		glTexCoord2f(0.0f, 0.0f);
 		glVertex3f(-0.5f, -0.5f, -0.5f);
 		glTexCoord2f(0.0f, 1.0f);
@@ -136,6 +139,7 @@ public class HelloTraditioGL extends AbstractDemo {
 		glTexCoord2f(1.0f, 0.0f);
 		glVertex3f(-0.5f, 0.5f, -0.5f);
 
+		glNormal3f(0.0f, -1.0f, 0.0f);
 		glTexCoord2f(1.0f, 1.0f);
 		glVertex3f(0.5f, -0.5f, 0.5f);
 		glTexCoord2f(0.0f, 1.0f);
@@ -149,6 +153,7 @@ public class HelloTraditioGL extends AbstractDemo {
 		glTexCoord2f(1.0f, 0.0f);
 		glVertex3f(0.5f, -0.5f, -0.5f);
 
+		glNormal3f(0.0f, 0.0f, -1.0f);
 		glTexCoord2f(1.0f, 1.0f);
 		glVertex3f(0.5f, -0.5f, -0.5f);
 		glTexCoord2f(0.0f, 1.0f);

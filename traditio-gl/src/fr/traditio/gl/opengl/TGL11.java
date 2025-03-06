@@ -17,6 +17,8 @@ public class TGL11 {
 	public static final int GL_STENCIL_BUFFER_BIT = 0x400;
 	public static final int GL_COLOR_BUFFER_BIT = 0x4000;
 
+	public static final int GL_MAX_LIGHTS = 0xD31;
+
 	public static final int GL_DEPTH_TEST = 0xB71;
 	public static final int GL_CULL_FACE = 0xB44;
 	public static final int GL_TEXTURE_2D = 0xDE1;
@@ -182,6 +184,10 @@ public class TGL11 {
 
 	public static void glHint(int target, int hint) {
 		GL11C.glHint(target, hint);
+	}
+
+	public static int glGetInteger(int pname) {
+		return GL11C.glGetInteger(pname);
 	}
 
 	public static void glLighti(int light, int pname, int param) {

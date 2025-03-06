@@ -11,14 +11,17 @@ uniform mat4 modelView;
 	out float fog_distance;
 #endif
 
+out vec3 vertex_pos;
 out vec4 vertex_color;
 out vec2 vertex_texCoord;
-out vec3 vertex_normal;
+out vec3 worldNormal;
 
 void main() {
+	vertex_pos = in_position;
 	vertex_color = in_color;
 	vertex_texCoord = in_texCoord;
-	vertex_normal = in_normal;
+	
+	worldNormal = normalize(mat3(modelView) * in_normal);
 	
 	vec4 viewPosition = modelView * vec4(in_position, 1.0);
 	gl_Position = projection * viewPosition;

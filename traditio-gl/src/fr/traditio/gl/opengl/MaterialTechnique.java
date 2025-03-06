@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.lwjgl.system.MemoryStack;
+
 class MaterialTechnique {
 
 	public static final List<String> DEFINE_NAMES = Arrays.asList("USE_TEXTURE", "USE_FOG", "FOG_LINEAR", "FOG_EXP",
@@ -49,6 +51,17 @@ class MaterialTechnique {
 				currentShader.uniform2f("fogLinearRange", c.fogStart, c.fogEnd);
 			} else if (c.fogMode == TGL11.GL_EXP || c.fogMode == TGL11.GL_EXP2) {
 				currentShader.uniformf("fogDensity", c.fogDensity);
+			}
+		}
+
+		if (c.enableLighting && name.equals("lit")) {
+			currentShader.createUBO(c.lights.length * Light.SIZE);
+			try (var stack = MemoryStack.stackPush()) {
+				var buffer = stack.malloc(c.lights.length * Light.SIZE);
+				for (var light : c.lights) {
+					light.fill(buffer);
+				}
+				currentShader.updateUBO(buffer);
 			}
 		}
 	}

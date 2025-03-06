@@ -1,11 +1,15 @@
 package fr.traditio.gl.opengl;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
+import org.lwjgl.opengl.GL31;
 import org.lwjgl.system.MemoryStack;
 
 import fr.traditio.gl.math.Matrix4f;
@@ -22,9 +26,43 @@ class Shader {
 
 	DefineSet defines;
 
+	private int ubo = INVALID_ID;
+
 	Shader(String name, DefineSet defines) {
 		this.name = name;
 		this.defines = defines;
+	}
+
+	void createUBO(long size) {
+		if (ubo != INVALID_ID) {
+			return;
+		}
+
+		use();
+
+		ubo = GL15.glGenBuffers();
+		GL15.glBindBuffer(GL31.GL_UNIFORM_BUFFER, ubo);
+
+		// Allocate memory.
+		GL15.glBufferData(GL31.GL_UNIFORM_BUFFER, size, GL15.GL_DYNAMIC_DRAW);
+
+		// Bind UBO to binding point 1.
+		GL30.glBindBufferBase(GL31.GL_UNIFORM_BUFFER, 1, ubo);
+		GL15.glBindBuffer(GL31.GL_UNIFORM_BUFFER, 0);
+	}
+
+	void updateUBO(ByteBuffer buffer) {
+		if (ubo == INVALID_ID) {
+			return;
+		}
+
+		use();
+
+		buffer.flip();
+
+		GL15.glBindBuffer(GL31.GL_UNIFORM_BUFFER, ubo);
+		GL15.glBufferSubData(GL31.GL_UNIFORM_BUFFER, 0, buffer);
+		GL15.glBindBuffer(GL31.GL_UNIFORM_BUFFER, 0);
 	}
 
 	public void uniformMat4(String name, Matrix4f value) {
@@ -125,7 +163,7 @@ class Shader {
 
 	public String readAsString(String path, Charset charset, String pattern) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("#version 330 core");
+		sb.append("#version 420");
 		sb.append('\n');
 
 		for (int i = 0; i < MaterialTechnique.DEFINE_NAMES.size(); i++) {
@@ -167,6 +205,11 @@ class Shader {
 
 	public void cleanup() {
 		unuse();
+
+		if (ubo != INVALID_ID) {
+			GL15.glDeleteBuffers(ubo);
+			this.ubo = INVALID_ID;
+		}
 
 		if (programId != INVALID_ID) {
 			GL20.glDeleteProgram(programId);

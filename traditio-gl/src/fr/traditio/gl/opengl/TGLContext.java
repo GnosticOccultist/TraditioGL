@@ -1,5 +1,6 @@
 package fr.traditio.gl.opengl;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,7 +71,7 @@ public class TGLContext {
 	boolean sRGB = false;
 
 	boolean enableLighting = false;
-	final Light[] lights = new Light[8];
+	Light[] lights = null;
 
 	TGLContext(GLCapabilities capabilities) {
 		this.capabilities = capabilities;
@@ -81,6 +82,11 @@ public class TGLContext {
 
 	private void initialize() {
 		mesh = new Mesh(600, capabilities);
+
+		var maxNumLight = TGL11.glGetInteger(TGL11.GL_MAX_LIGHTS);
+		lights = new Light[maxNumLight];
+
+		Arrays.fill(lights, new Light());
 
 		lights[0].diffuse.set(1.0f, 1.0f, 1.0f, 1.0f);
 		lights[0].specular.set(1.0f, 1.0f, 1.0f, 1.0f);
