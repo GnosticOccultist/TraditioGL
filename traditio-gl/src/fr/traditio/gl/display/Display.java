@@ -51,6 +51,10 @@ public class Display {
 	 */
 	private static boolean created;
 	/**
+	 * Whether the window is active.
+	 */
+	private static boolean active;
+	/**
 	 * Whether the window is resizable.
 	 */
 	private static boolean resizable;
@@ -166,6 +170,10 @@ public class Display {
 			}
 		});
 
+		GLFW.glfwSetWindowFocusCallback(glfwWindowHandle, (handle, focused) -> {
+			active = focused;
+		});
+
 		width = Display.getDisplayMode().getWidth();
 		height = Display.getDisplayMode().getHeight();
 
@@ -213,19 +221,29 @@ public class Display {
 		if (resized) {
 			c.resized();
 		}
-		
-		// TODO: We paint only when the window is visible or dirty
-		try {
-			swapBuffers();
-		} catch (TraditioGLException ex) {
-			throw new RuntimeException(ex);
+
+		if (isActive()) {
+			try {
+				swapBuffers();
+			} catch (TraditioGLException ex) {
+				throw new RuntimeException(ex);
+			}
 		}
 
 		resized = false;
 
 		if (processMessages) {
-			GLFW.glfwPollEvents();
+			processMessages();
 		}
+	}
+
+	/**
+	 * Process operating system events. Call this to update the Display's state and
+	 * to receive new input device events. This method is called from update(), so
+	 * it is not necessary to call this method if update() is called periodically.
+	 */
+	public static void processMessages() {
+		GLFW.glfwPollEvents();
 	}
 
 	/**
@@ -435,6 +453,16 @@ public class Display {
 
 		assert glfwWindowHandle != MemoryUtil.NULL;
 		return GLFW.glfwWindowShouldClose(glfwWindowHandle);
+	}
+
+	/**
+	 * Return whether the window <code>Display</code> is active, that is, the
+	 * foreground display of the operating system.
+	 * 
+	 * @return Whether the window is active.
+	 */
+	public static boolean isActive() {
+		return active;
 	}
 
 	/**
